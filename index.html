@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Trip Ledger">
+<meta name="theme-color" content="#0f2444">
+<title>Trip Ledger Pro 🚛</title>
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Trip Ledger Pro">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#f1f5f9;min-height:100vh;max-width:640px;margin:0 auto;padding-bottom:80px;-webkit-overflow-scrolling:touch}
+input,select,textarea,button{font-family:inherit;-webkit-appearance:none;appearance:none;border-radius:0}
+button{cursor:pointer;transition:opacity .15s;-webkit-touch-callout:none}
+button:active{opacity:.75}
+input[type=date],input[type=month]{-webkit-appearance:none;appearance:none}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:640px;background:#0f2444;display:flex;border-top:1px solid rgba(255,255,255,.1);z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 8px;color:rgba(255,255,255,.4);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;border:none;background:none;gap:4px;min-height:52px}
+.nb.on{color:#fb923c}
+.nb svg{width:20px;height:20px;flex-shrink:0}
+
+/* AUTH SCREEN */
+.auth-screen{min-height:100vh;background:linear-gradient(160deg,#0f2444,#1e40af);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;padding-bottom:env(safe-area-inset-bottom,24px)}
+.auth-card{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.auth-title{font-size:22px;font-weight:900;color:#1e293b;margin-bottom:4px}
+.auth-sub{font-size:13px;color:#94a3b8;margin-bottom:24px}
+.auth-inp{width:100%;padding:12px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;color:#1e293b;outline:none;margin-bottom:12px;background:#fff}
+.auth-inp:focus{border-color:#3b82f6}
+.auth-btn{width:100%;padding:13px;background:linear-gradient(135deg,#1e40af,#f97316);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;margin-bottom:12px;box-shadow:0 4px 14px rgba(249,115,22,.3)}
+.auth-link{text-align:center;font-size:13px;color:#3b82f6;font-weight:600;cursor:pointer;background:none;border:none;width:100%;padding:4px}
+.auth-err{background:#fef2f2;color:#dc2626;border-radius:8px;padding:10px 12px;font-size:12px;font-weight:600;margin-bottom:12px;display:none}
+
+/* HERO */
+.hero{background:linear-gradient(160deg,#0f2444,#1e40af);padding:20px 16px 16px;padding-top:calc(20px + env(safe-area-inset-top,0px));box-shadow:0 6px 24px rgba(15,36,68,.4)}
+.stats-row{display:flex;gap:6px;margin-top:10px}
+.stat{flex:1;background:rgba(255,255,255,.12);border-radius:10px;padding:9px 4px;text-align:center}
+.stat-v{font-size:12px;font-weight:900;color:#fff;line-height:1}
+.stat-v.g{color:#86efac}.stat-v.r{color:#fca5a5}
+.stat-l{font-size:8px;color:rgba(255,255,255,.55);margin-top:3px;text-transform:uppercase;letter-spacing:.3px}
+
+/* PAGE HDR */
+.phdr{background:linear-gradient(135deg,#0f2444,#1e40af);padding:14px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(15,36,68,.3)}
+.phdr-title{font-size:16px;font-weight:800;color:#fff;flex:1}
+.back-btn{background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:7px;color:#fff;display:flex;align-items:center;flex-shrink:0}
+.hadd-btn{background:rgba(255,255,255,.18);border:none;border-radius:8px;padding:7px 12px;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;gap:4px;flex-shrink:0}
+
+/* CARDS */
+.ngrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:12px}
+.nc{background:#fff;border-radius:12px;padding:12px 8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06);border-bottom:3px solid #e2e8f0;text-align:center}
+.nc-e{font-size:22px;margin-bottom:4px}
+.nc-l{font-weight:800;font-size:11px;color:#1e293b;line-height:1.2}
+.nc-s{font-size:10px;color:#94a3b8;margin-top:2px}
+
+/* COMMON */
+.sec{padding:10px 14px}
+.sec-title{font-weight:800;font-size:10px;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.row{display:flex;gap:8px}
+.card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.trip-row{display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:9px 12px;margin-bottom:6px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.vpill{background:#eff6ff;color:#1d4ed8;font-weight:800;font-size:11px;padding:3px 8px;border-radius:6px;flex-shrink:0}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0f2444,#1e40af);color:#fff;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* FORM */
+.flbl{font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px;display:block}
+.finp{padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;background:#fff;outline:none;width:100%;color:#1e293b}
+.finp:focus{border-color:#3b82f6}
+.fsel{padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;background:#fff;outline:none;width:100%;color:#1e293b}
+.fgrp{margin-bottom:10px}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;gap:6px;border:none;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:800}
+.btn.primary{background:linear-gradient(135deg,#1e40af,#f97316);color:#fff;box-shadow:0 3px 12px rgba(249,115,22,.25)}
+.btn.full{width:100%;justify-content:center}
+.btn.green{background:#15803d;color:#fff}
+.btn.wa{background:#25d366;color:#fff}
+.btn.red{background:#dc2626;color:#fff}
+.btn.gray{background:#f1f5f9;color:#64748b}
+.btn.sm{padding:8px 12px;font-size:12px;border-radius:8px}
+.btn-del{background:#fff0f0;color:#dc2626;border:none;border-radius:6px;padding:5px 6px;display:flex;align-items:center}
+.btn-edit{background:#eff6ff;color:#1d4ed8;border:none;border-radius:6px;padding:5px 6px;display:flex;align-items:center}
+.action-row{display:flex;gap:8px;padding:4px 14px 8px;flex-wrap:wrap}
+.chip{padding:6px 10px;border-radius:20px;border:2px solid #e2e8f0;font-size:12px;font-weight:700;background:#fff;color:#64748b;display:inline-flex;align-items:center;gap:3px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.chip.on{border-color:#16a34a;background:#f0fdf4;color:#15803d}
+.chip-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.type-btns{display:flex;gap:5px}
+.tbtn{flex:1;padding:8px 4px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:700;background:#fff;color:#64748b}
+.tbtn.on{border-color:#1e40af;background:#1e40af;color:#fff}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;min-width:360px}
+th{padding:8px;color:#fff;font-weight:700;text-align:left;font-size:11px;background:#1e3a5f}
+td{padding:7px 8px;color:#334155;border-bottom:1px solid #f1f5f9}
+tr:nth-child(even) td{background:#f8fafc}
+tfoot td{background:#eff6ff;font-weight:800;color:#1d4ed8}
+tfoot tr:last-child td{background:#1e3a5f;color:#fff;font-weight:900;font-size:13px}
+
+/* CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:120px;background:#fff;border-radius:12px;padding:12px 8px 8px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+.bar-lbl{font-size:8px;color:#94a3b8;font-weight:700;white-space:nowrap}
+
+/* SUMMARY CARDS */
+.scards{display:flex;gap:6px;padding:8px 14px 4px}
+.sc{flex:1;background:#fff;border-radius:10px;padding:9px 4px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sc-v{font-weight:900;font-size:11px;color:#334155}
+.sc-l{font-size:9px;color:#94a3b8;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* FILTER */
+.fbox{background:#fff;padding:10px 14px 8px;border-bottom:1px solid #f1f5f9}
+
+/* BADGES */
+.paid-badge{background:#dcfce7;color:#15803d;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700}
+.unpaid-badge{background:#fee2e2;color:#dc2626;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700}
+.partial-badge{background:#fef9c3;color:#854d0e;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);color:#fff;padding:10px 22px;border-radius:100px;font-weight:700;font-size:13px;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.25);white-space:nowrap;pointer-events:none;display:none}
+
+/* LOADING */
+.loader{position:fixed;inset:0;background:linear-gradient(160deg,#0f2444,#1e40af);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999}
+.spinner{width:44px;height:44px;border:4px solid rgba(255,255,255,.2);border-top-color:#60a5fa;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EMPTY */
+.empty{text-align:center;padding:28px 0;color:#94a3b8}
+.empty-e{font-size:36px;margin-bottom:8px}
+
+/* DATE INP */
+.dinp{border:none;border-radius:8px;padding:6px 8px;font-size:12px;background:rgba(255,255,255,.92);font-weight:700;color:#1e293b;outline:none}
+
+/* V-BLOCK */
+.vblock{margin:8px 14px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08);border-left:4px solid #f97316}
+.vblock-hdr{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff7ed;border-bottom:1px solid #fed7aa}
+
+/* ROUTE FORM */
+.rform{background:#f8fafc;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #e2e8f0}
+
+/* USER BADGE */
+.user-badge{background:rgba(255,255,255,.15);border-radius:8px;padding:5px 10px;display:flex;align-items:center;gap:6px}
+
+@media print{.nav,.no-print{display:none!important}body{padding-bottom:0;max-width:100%}}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loader" id="loader">
+  <div style="font-size:48px;margin-bottom:8px">🚛</div>
+  <div class="spinner"></div>
+  <div style="color:#fff;font-weight:700;font-size:16px">Trip Ledger Pro</div>
+  <div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:4px">Loading...</div>
+</div>
+
+<div id="app" style="display:none"></div>
+<div id="toast" class="toast"></div>
+
+<nav class="nav" id="main-nav" style="display:none">
+  <button class="nb on" id="nb-home" onclick="go('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Home
+  </button>
+  <button class="nb" id="nb-entry" onclick="go('entry')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Entry
+  </button>
+  <button class="nb" id="nb-bills" onclick="go('bills')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>Bills
+  </button>
+  <button class="nb" id="nb-cash" onclick="go('cash')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Cash
+  </button>
+  <button class="nb" id="nb-more" onclick="go('more')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>More
+  </button>
+</nav>
+
+<!-- Firebase SDKs -->
+<script>
+// Firebase load check
+window._fbTimeout = setTimeout(()=>{
+  const loader = document.getElementById('loader');
+  if(loader && getComputedStyle(loader).display !== 'none'){
+    loader.innerHTML = '<div style="padding:30px;text-align:center"><div style="font-size:40px;margin-bottom:12px">⚠️</div><div style="color:#fff;font-size:16px;font-weight:700;margin-bottom:8px">Network Error</div><div style="color:rgba(255,255,255,.7);font-size:12px;margin-bottom:20px">Internet check karo aur retry karo.</div><button onclick="location.reload()" style="background:#f97316;color:#fff;border:none;border-radius:10px;padding:12px 24px;font-size:14px;font-weight:800">🔄 Retry</button></div>';
+  }
+}, 8000);
+</script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+clearTimeout(window._fbTimeout);
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD6LX8ZAOyWBvxIVJDLFF2eRZ9OlBqlQKo",
+  authDomain: "trip-ledger-pro.firebaseapp.com",
+  projectId: "trip-ledger-pro",
+  storageBucket: "trip-ledger-pro.firebasestorage.app",
+  messagingSenderId: "500237765860",
+  appId: "1:500237765860:web:1acf08573cbf08ead4f0f1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+function userRef(col){ return collection(db,'users',currentUser.uid,col); }
+function userDocRef(col,id){ return doc(db,'users',currentUser.uid,col,id); }
+
+// ── AUTH FUNCTIONS ──────────────────────────────────────────────────────────
+function doAuth(){
+  const email=(document.getElementById('auth-email')?.value||'').trim();
+  const pass=document.getElementById('auth-pass')?.value||'';
+  if(!email||!pass){toast('Email aur password daalein','err');return;}
+  if(S.authMode==='login'){
+    signInWithEmailAndPassword(auth,email,pass).catch(e=>toast('Email ya password galat hai','err'));
+  } else {
+    createUserWithEmailAndPassword(auth,email,pass).catch(e=>toast(e.message,'err'));
+  }
+}
+function doLogout(){ signOut(auth); }
+function forgotPass(){
+  const email=(document.getElementById('auth-email')?.value||'').trim();
+  if(!email){toast('Pehle email daalein','err');return;}
+  sendPasswordResetEmail(auth,email).then(()=>toast('Reset email bheja!')).catch(e=>toast(e.message,'err'));
+}
+
+// ── LOAD ALL DATA ───────────────────────────────────────────────────────────
+async function loadAllData(){
+  loading(true);
+  const safetyTimer=setTimeout(()=>{loading(false);toast('Connection slow','err');render();},12000);
+  try{
+    const[tSnap,cSnap,vSnap,dSnap,eSnap,pSnap,coSnap]=await Promise.all([
+      getDocs(userRef('trips')),
+      getDocs(userRef('clients')),
+      getDocs(userRef('vehicles')),
+      getDocs(userRef('drivers')),
+      getDocs(userRef('expenses')),
+      getDocs(userRef('payments')),
+      getDoc(doc(db,'users',currentUser.uid,'settings','company')),
+    ]);
+    trips=tSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    clients=cSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const vehDocs=vSnap.docs.map(d=>({id:d.id,...d.data()}));
+    vehicles=vehDocs.map(v=>v.number);
+    window._vehDetails=vehDocs;
+    drivers=dSnap.docs.map(d=>({id:d.id,...d.data()}));
+    expenses=eSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    payments=pSnap.docs.map(d=>({id:d.id,...d.data()}));
+    try{const dpSnap=await getDocs(userRef('driverPayments'));driverPayments=dpSnap.docs.map(d=>({id:d.id,...d.data()}));}catch(e){driverPayments=[];}
+    company=coSnap.exists()?coSnap.data():{name:'',gst:'',address:'',city:'',phone:'',bankName:'',bankAcc:'',bankIFSC:''};
+    if(clients.length===0){
+      const defClients=[{name:'Milan Bhai',gstNo:'',routes:[{id:'r1',from:'Jaipur',to:'Delhi',rate:4500}]},{name:'Suresh Transport',gstNo:'',routes:[{id:'r2',from:'Jaipur',to:'Mumbai',rate:8000}]}];
+      for(const c of defClients){const ref=await addDoc(userRef('clients'),c);clients.push({id:ref.id,...c});}
+    }
+    if(vehicles.length===0){
+      await setDoc(doc(db,'users',currentUser.uid,'vehicles','v1'),{number:'RJ14GB1234'});
+      vehicles=['RJ14GB1234'];window._vehDetails=[{id:'v1',number:'RJ14GB1234'}];
+    }
+  }catch(e){console.error(e);toast('Load error: '+e.message,'err');}
+  clearTimeout(safetyTimer);loading(false);S.settForm={...company};render();
+}
+
+// ── SAVE FUNCTIONS ──────────────────────────────────────────────────────────
+async function saveTrip(t,id){
+  try{
+    if(id){await setDoc(doc(db,'users',currentUser.uid,'trips',id),t);trips=trips.map(x=>x.id===id?{id,...t}:x);}
+    else{const r=await addDoc(userRef('trips'),t);trips.unshift({id:r.id,...t});}
+    return true;
+  }catch(e){toast('Save error','err');return false;}
+}
+async function delTrip(id){try{await deleteDoc(doc(db,'users',currentUser.uid,'trips',id));trips=trips.filter(t=>t.id!==id);render();}catch(e){toast('Error','err');}}
+async function saveClient(data,id){
+  try{
+    if(id){await setDoc(doc(db,'users',currentUser.uid,'clients',id),data);clients=clients.map(c=>c.id===id?{id,...data}:c);}
+    else{const r=await addDoc(userRef('clients'),data);clients.push({id:r.id,...data});}
+    return true;
+  }catch(e){toast('Save error','err');return false;}
+}
+async function delClient(id){try{await deleteDoc(doc(db,'users',currentUser.uid,'clients',id));clients=clients.filter(c=>c.id!==id);render();}catch(e){}}
+async function saveVehicle(num){
+  const r=await addDoc(userRef('vehicles'),{number:num});
+  const vd=window._vehDetails||[];vd.push({id:r.id,number:num});window._vehDetails=vd;vehicles.push(num);
+}
+async function doAddVeh(){
+  const v=(document.getElementById('new-veh')?.value||'').trim().toUpperCase();
+  if(!v)return;if(vehicles.includes(v)){toast('Pehle se hai','err');return;}
+  await saveVehicle(v);document.getElementById('new-veh').value='';toast('Vehicle add ✓');render();
+}
+async function doDelVeh(v){
+  if(!confirm('Delete?'))return;
+  const vd=window._vehDetails||[];const obj=vd.find(x=>x.number===v);
+  if(obj){await deleteDoc(doc(db,'users',currentUser.uid,'vehicles',obj.id));}
+  window._vehDetails=(window._vehDetails||[]).filter(x=>x.number!==v);vehicles=vehicles.filter(x=>x!==v);render();toast('Deleted','err');
+}
+async function saveDriver(data,id){
+  try{
+    if(id){await setDoc(doc(db,'users',currentUser.uid,'drivers',id),data);drivers=drivers.map(d=>d.id===id?{id,...data}:d);}
+    else{const r=await addDoc(userRef('drivers'),data);drivers.push({id:r.id,...data});}
+    return true;
+  }catch(e){toast('Save error','err');return false;}
+}
+async function delDriver(id){try{await deleteDoc(doc(db,'users',currentUser.uid,'drivers',id));drivers=drivers.filter(d=>d.id!==id);render();}catch(e){}}
+async function saveExpense(exp){
+  const r=await addDoc(userRef('expenses'),exp);expenses.unshift({id:r.id,...exp});render();
+}
+async function delExpense(id){try{await deleteDoc(doc(db,'users',currentUser.uid,'expenses',id));expenses=expenses.filter(e=>e.id!==id);render();}catch(e){}}
+async function savePayment(data,id){
+  try{
+    if(id){await setDoc(doc(db,'users',currentUser.uid,'payments',id),data);payments=payments.map(p=>p.id===id?{id,...data}:p);}
+    else{const r=await addDoc(userRef('payments'),data);payments.push({id:r.id,...data});}
+    return true;
+  }catch(e){toast('Save error','err');return false;}
+}
+async function saveCompany(data){
+  try{await setDoc(doc(db,'users',currentUser.uid,'settings','company'),data);company=data;return true;}
+  catch(e){toast('Save error','err');return false;}
+}
+async function saveDriverPayment(driverId,driverName,month,amount,type,note){
+  try{
+    const dp={driverId,driverName,month,amount:Number(amount),type,note:note||'',date:today()};
+    const r=await addDoc(userRef('driverPayments'),dp);driverPayments.push({id:r.id,...dp});render();return true;
+  }catch(e){toast('Save error','err');return false;}
+}
+async function delDriverPayment(id){
+  try{await deleteDoc(doc(db,'users',currentUser.uid,'driverPayments',id));driverPayments=driverPayments.filter(p=>p.id!==id);render();}catch(e){}
+}
+async function editVehDetails(vNum){
+  const vInfo=(window._vehDetails||[]).find(x=>x.number===vNum)||{};
+  const insExp=prompt('Insurance expiry (YYYY-MM-DD):',vInfo.insuranceExp||'');
+  const rcExp=prompt('RC expiry (YYYY-MM-DD):',vInfo.rcExp||'');
+  const vDoc=(window._vehDetails||[]).find(x=>x.number===vNum);
+  if(vDoc){
+    const updated={number:vNum,insuranceExp:insExp||'',rcExp:rcExp||''};
+    await setDoc(doc(db,'users',currentUser.uid,'vehicles',vDoc.id),updated);
+    const idx=window._vehDetails.findIndex(x=>x.number===vNum);
+    if(idx>=0)window._vehDetails[idx]={...window._vehDetails[idx],...updated};
+    toast('✓ Saved!');render();
+  }
+}
+function fullBackup(){
+  const rows=[['Type','Date','Vehicle','Client','From','To','Amount'],...trips.map(t=>['Trip',t.date,t.vehicleNo,t.client,t.from,t.to,t.amount]),...expenses.map(e=>['Expense',e.date,e.vehicle,'',e.category,'',e.amount])];
+  dlFile(rows.map(r=>r.join(',')).join('
+'),'backup_'+today()+'.csv','text/csv');
+  toast('Backup download ✓');
+}
+
+// ── AUTH STATE ──────────────────────────────────────────────────────────────
+const authTimeout=setTimeout(()=>{
+  if(document.getElementById('loader') && getComputedStyle(document.getElementById('loader')).display!=='none'){
+    document.getElementById('loader').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('app').innerHTML='<div style="min-height:100vh;background:linear-gradient(160deg,#0f2444,#1e40af);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">⚠️</div><div style="color:#fff;font-weight:700;font-size:18px;margin-bottom:8px">Connection Error</div><div style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:20px">Internet slow hai ya Firebase issue hai.<br>Page refresh karo.</div><button onclick="location.reload()" style="background:#f97316;color:#fff;border:none;border-radius:12px;padding:13px 28px;font-size:15px;font-weight:800">🔄 Refresh Karo</button></div>';
+  }
+},10000);
+
+onAuthStateChanged(auth, user=>{
+  clearTimeout(authTimeout);
+  if(user){currentUser=user;loadAllData();}
+  else{currentUser=null;trips=[];clients=[];vehicles=[];drivers=[];expenses=[];payments=[];company={};driverPayments=[];showAuth('login');}
+});
+
+
+
+let lang='hi';
+const T={
+  hi:{home:'होम',entry:'एंट्री',bills:'बिल',cash:'कैश',more:'अधिक',trips:'ट्रिप्स',revenue:'कमाई',expenses:'खर्चे',profit:'मुनाफा',drivers:'ड्राइवर',vehicles:'गाड़ियां',clients:'क्लाइंट',settings:'सेटिंग',history:'इतिहास',report:'रिपोर्ट',salary:'सैलरी',payment:'पेमेंट',paid:'पेड',unpaid:'बाकी',advance:'एडवांस',insurance:'इंश्योरेंस',expiry:'एक्सपायरी',add:'जोड़ें',save:'सेव',cancel:'रद्द',delete:'डिलीट',edit:'एडिट',back:'वापस'},
+  en:{home:'Home',entry:'Entry',bills:'Bills',cash:'Cash',more:'More',trips:'Trips',revenue:'Revenue',expenses:'Expenses',profit:'Profit',drivers:'Drivers',vehicles:'Vehicles',clients:'Clients',settings:'Settings',history:'History',report:'Report',salary:'Salary',payment:'Payment',paid:'Paid',unpaid:'Pending',advance:'Advance',insurance:'Insurance',expiry:'Expiry',add:'Add',save:'Save',cancel:'Cancel',delete:'Delete',edit:'Edit',back:'Back'}
+};
+function t(k){return (T[lang]&&T[lang][k])||k;}
+let S={
+  page:'home', authMode:'login',
+  entryDate:today(), pending:[],
+  billClient:'all',billPeriod:'month',billFrom:'',billTo:'',billNo:'001',billGst:false,
+  billPrintData:null,showBillPrint:false,
+  cashMonth:today().slice(0,7),cashDate:today(),cashCat:'driver_cash',cashSelV:[],cashAmt:'',cashDesc:'',showCashForm:false,
+  clientForm:null,editingClient:null,
+  driverForm:null,editingDriver:null,
+  settForm:{...company},
+  histFilter:{period:'month',client:'all',vehicle:'all',from:'',to:''},
+  plMonth:today().slice(0,7),
+  payModal:null,
+  driverSalaryPage:null,
+  driverSalaryMonth:today().slice(0,7),
+};
+
+// ── ROUTER ──────────────────────────────────────────────────────────────────
+function go(page){
+  S.page=page;S.showBillPrint=false;S.clientForm=null;S.driverForm=null;S.payModal=null;S.driverSalaryPage=null;
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  const nb=document.getElementById('nb-'+page);if(nb)nb.classList.add('on');
+  render();
+}
+function render(){document.getElementById('app').innerHTML=buildPage();}
+
+// ── ICONS ──────────────────────────────────────────────────────────────────
+const I={
+  back:`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>`,
+  plus:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+  del:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>`,
+  edit:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4z"/></svg>`,
+  ok:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg>`,
+  truck:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 4v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+  dl:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+  wa:`<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>`,
+};
+
+// ── BUILD PAGE ──────────────────────────────────────────────────────────────
+function buildPage(){
+  if(S.showBillPrint)return pageBillPrint();
+  if(S.clientForm)return pageClientForm();
+  if(S.driverForm)return pageDriverForm();
+  if(S.payModal)return pagePayModal();
+  if(S.driverSalaryPage)return pageDriverSalary();
+  switch(S.page){
+    case 'home':    return pageHome();
+    case 'entry':   return pageEntry();
+    case 'bills':   return pageBills();
+    case 'cash':    return pageCash();
+    case 'more':    return pageMore();
+    case 'clients': return pageClients();
+    case 'fleet':   return pageFleet();
+    case 'drivers': return pageDrivers();
+    case 'history': return pageHistory();
+    case 'pl':      return pagePL();
+    case 'payments':return pagePayments();
+    case 'settings':return pageSettings();
+    default:        return pageHome();
+  }
+}
+
+// ── AUTH PAGE ──────────────────────────────────────────────────────────────
+function showAuth(mode){
+  S.authMode=mode||'login';
+  document.getElementById('loader').style.display='none';
+  document.getElementById('main-nav').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('app').innerHTML=pageAuth();
+}
+
+function pageAuth(){
+  const isLogin=S.authMode==='login';
+  return `
+  <div class="auth-screen">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:52px;margin-bottom:8px">🚛</div>
+      <div style="font-size:24px;font-weight:900;color:#fff">Trip Ledger Pro</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.6);margin-top:4px">Transport Management System</div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-title">${isLogin?'Login Karein':'Account Banayein'}</div>
+      <div class="auth-sub">${isLogin?'Apne account mein login karein':'Naya free account banayein'}</div>
+      <div class="auth-err" id="auth-err"></div>
+      ${!isLogin?`<input class="auth-inp" id="auth-name" type="text" placeholder="Aapka Naam" autocomplete="name">`:''}
+      <input class="auth-inp" id="auth-email" type="email" placeholder="Email Address" autocomplete="email" autocorrect="off" autocapitalize="off">
+      <input class="auth-inp" id="auth-pass" type="password" placeholder="Password (min 6 characters)" autocomplete="${isLogin?'current-password':'new-password'}">
+      <button class="auth-btn" onclick="doAuth()">${isLogin?'🔐 Login':'🚀 Account Banao'}</button>
+      <button class="auth-link" onclick="S.authMode='${isLogin?'register':'login'}';document.getElementById('app').innerHTML=pageAuth()">
+        ${isLogin?'Naya account banao →':'Pehle se account hai? Login karo →'}
+      </button>
+      ${isLogin?`<button class="auth-link" style="color:#94a3b8;font-size:12px" onclick="forgotPass()">Password bhool gaye?</button>`:''}
+    </div>
+  </div>`;
+}
+
+async function doAuth(){
+  const email=(document.getElementById('auth-email')?.value||'').trim();
+  const pass=document.getElementById('auth-pass')?.value||'';
+  const name=document.getElementById('auth-name')?.value||'';
+  const errEl=document.getElementById('auth-err');
+
+  if(!email||!pass){showErr('Email aur password daalein');return;}
+  if(S.authMode==='register'&&pass.length<6){showErr('Password kam se kam 6 characters ka ho');return;}
+
+  const btn=document.querySelector('.auth-btn');
+  btn.textContent='Loading...';btn.disabled=true;
+
+  try{
+    if(S.authMode==='register'){
+      const cred=await createUserWithEmailAndPassword(auth,email,pass);
+      if(name) await updateProfile(cred.user,{displayName:name});
+    } else {
+      await signInWithEmailAndPassword(auth,email,pass);
+    }
+  }catch(e){
+    btn.textContent=S.authMode==='login'?'🔐 Login':'🚀 Account Banao';
+    btn.disabled=false;
+    const msgs={'auth/user-not-found':'Email nahi mila','auth/wrong-password':'Galat password','auth/email-already-in-use':'Email pehle se registered hai','auth/invalid-email':'Invalid email','auth/weak-password':'Password weak hai','auth/invalid-credential':'Email ya password galat hai'};
+    showErr(msgs[e.code]||e.message);
+  }
+}
+
+function showErr(msg){
+  const el=document.getElementById('auth-err');
+  if(el){el.textContent=msg;el.style.display='block';}
+}
+
+async function forgotPass(){
+  const email=prompt('Email address daalo:');
+  if(!email)return;
+  try{
+    // password reset not needed in local mode
+    await sendPasswordResetEmail(auth,email);
+    toast('✓ Reset email bheja gaya!');
+  }catch(e){toast('Error: '+e.message,'err');}
+}
+
+async function doLogout(){
+  if(!confirm('Logout karna chahte ho?'))return;
+  try{await signOut(auth);}catch(e){toast('Logout error','err');}
+}
+
+// ── AUTH STATE ──────────────────────────────────────────────────────────────
+// Auth timeout — agar 10 sec mein response nahi aya toh login screen dikhao
+const authTimeout=setTimeout(()=>{
+  if(document.getElementById('loader').style.display!=='none'){
+    document.getElementById('loader').style.display='none';
+    document.getElementById('app').style.display='block';
+    document.getElementById('app').innerHTML='<div style="min-height:100vh;background:linear-gradient(160deg,#0f2444,#1e40af);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center"><div style="font-size:48px;margin-bottom:12px">⚠️</div><div style="color:#fff;font-weight:700;font-size:18px;margin-bottom:8px">Connection Error</div><div style="color:rgba(255,255,255,.7);font-size:13px;margin-bottom:20px">Internet slow hai ya Firebase issue hai.<br>Page refresh karo.</div><button onclick="location.reload()" style="background:#f97316;color:#fff;border:none;border-radius:12px;padding:13px 28px;font-size:15px;font-weight:800">🔄 Refresh Karo</button></div>';
+  }
+},6000);
+
+onAuthStateChanged(auth, user=>{
+  clearTimeout(authTimeout);
+  if(user){
+    currentUser=user;
+    loadAllData();
+  } else {
+    currentUser=null;
+    trips=[];clients=[];vehicles=[];drivers=[];expenses=[];payments=[];company={};
+    showAuth('login');
+  }
+});
+
+// ── HOME ──────────────────────────────────────────────────────────────────
+function pageHome(){
+  const todayT=trips.filter(t=>t.date===today());
+  const monthKey=today().slice(0,7);
+  const monthT=trips.filter(t=>t.date.startsWith(monthKey));
+  const totalRev=monthT.reduce((s,t)=>s+t.amount,0);
+  const totalExp=expenses.filter(e=>e.date.startsWith(monthKey)).reduce((s,e)=>s+e.amount,0);
+  const net=totalRev-totalExp;
+  const ps=getPayStatus();
+  const unpaidAmt=ps.filter(p=>p.status!=='paid').reduce((s,p)=>s+p.pending,0);
+  const userName=currentUser?.displayName||currentUser?.email?.split('@')[0]||'User';
+
+  return `
+  <div class="hero">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:24px">🚛</span><span style="font-size:19px;font-weight:900;color:#fff">Trip Ledger Pro</span></div>
+        <div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">Namaste, ${esc(userName)}! 👋</div>
+      </div>
+      <button onclick="doLogout()" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;padding:7px 10px;color:#fff;font-size:11px;font-weight:700">Logout</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-v">${todayT.length}</div><div class="stat-l">Aaj</div></div>
+      <div class="stat"><div class="stat-v g">${inr(totalRev)}</div><div class="stat-l">Mahine Kamai</div></div>
+      <div class="stat"><div class="stat-v r">${inr(totalExp)}</div><div class="stat-l">Kharcha</div></div>
+      <div class="stat"><div class="stat-v ${net>=0?'g':'r'}">${inr(net)}</div><div class="stat-l">Profit</div></div>
+    </div>
+  </div>
+
+  ${unpaidAmt>0?`<div style="background:#fef9c3;border-left:4px solid #eab308;margin:10px 14px;border-radius:10px;padding:10px 12px;cursor:pointer" onclick="go('payments')">
+    <div style="font-weight:800;font-size:13px;color:#854d0e">⚠️ Bakaya: ${inr(unpaidAmt)}</div>
+    <div style="font-size:11px;color:#713f12;margin-top:2px">Tap karo details dekhne ke liye →</div>
+  </div>`:''}
+
+  <div class="ngrid">
+    ${[
+      {e:'📝',l:'Daily Entry',s:'Trips add karo',c:'#f97316',p:'entry'},
+      {e:'🧾',l:'Bills',s:'GST/Non-GST',c:'#3b82f6',p:'bills'},
+      {e:'💰',l:'Cash Book',s:'Kharche',c:'#8b5cf6',p:'cash'},
+      {e:'📊',l:'P&L Report',s:'Profit/Loss',c:'#10b981',p:'pl'},
+      {e:'💳',l:'Payments',s:'Bakaya track',c:'#ef4444',p:'payments'},
+      {e:'📋',l:'History',s:'Puri history',c:'#6366f1',p:'history'},
+    ].map(n=>`<div class="nc" style="border-bottom-color:${n.c}" onclick="go('${n.p}')">
+      <div class="nc-e">${n.e}</div><div class="nc-l">${n.l}</div><div class="nc-s">${n.s}</div>
+    </div>`).join('')}
+  </div>
+
+  ${todayT.length>0?`<div class="sec">
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px"><div class="sec-title" style="margin:0">Aaj (${todayT.length})</div><span style="font-size:11px;color:#3b82f6;cursor:pointer" onclick="go('history')">Sab →</span></div>
+    ${todayT.slice(0,4).map(t=>`<div class="trip-row">
+      <div class="vpill">${esc(t.vehicleNo)}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(t.client)}</div>
+      <div style="font-size:11px;color:#94a3b8">${esc(t.from)}→${esc(t.to)}</div></div>
+      <div style="font-weight:900;font-size:13px;color:#16a34a">${inr(t.amount)}</div>
+    </div>`).join('')}
+  </div>`:`<div style="text-align:center;padding:24px 16px">
+    <div style="font-size:38px;margin-bottom:8px">📋</div>
+    <div style="font-weight:700;font-size:15px;color:#334155;margin-bottom:12px">Aaj koi trip nahi</div>
+    <button class="btn primary" style="margin:0 auto" onclick="go('entry')">${I.plus} Trip Entry Karo</button>
+  </div>`}`;
+}
+
+// ── ENTRY ──────────────────────────────────────────────────────────────────
+function pageEntry(){
+  const p=S.pending,total=p.reduce((s,x)=>s+x.rows.length,0);
+  const todayE=trips.filter(t=>t.date===S.entryDate);
+  return `
+  <div class="phdr">
+    <div style="flex:1"><div class="phdr-title">Daily Entry</div><div style="font-size:10px;color:rgba(255,255,255,.6)">${p.length} vehicles · ${total} trips</div></div>
+    <input type="date" class="dinp" value="${S.entryDate}" onchange="S.entryDate=this.value;render()">
+  </div>
+  <div class="sec"><div class="sec-title">Vehicle Select</div>
+    <div class="chip-wrap">${vehicles.map(v=>{const on=!!p.find(x=>x.vehicleNo===v);return`<div class="chip ${on?'on':''}" onclick="togV('${v}')">${on?I.ok+' ':''}${esc(v)}</div>`;}).join('')}
+    ${vehicles.length===0?`<div style="font-size:12px;color:#94a3b8">Pehle Fleet mein vehicle add karo</div>`:''}
+    </div>
+  </div>
+  ${p.map(pv=>`<div class="vblock">
+    <div class="vblock-hdr">
+      <div style="font-weight:800;font-size:13px;color:#1e40af;flex:1;display:flex;align-items:center;gap:6px">${I.truck} ${esc(pv.vehicleNo)}</div>
+      <button style="background:#1e40af;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:3px" onclick="addRow('${pv.vehicleNo}')">${I.plus} Trip</button>
+      <button class="btn-del" onclick="togV('${pv.vehicleNo}')" style="margin-left:4px">${I.del}</button>
+    </div>
+    ${pv.rows.map((r,i)=>rowHTML(pv.vehicleNo,r,i)).join('')}
+  </div>`).join('')}
+  ${p.length>0?`<div style="padding:8px 14px 16px"><button class="btn primary full" onclick="saveTrips()">${I.ok} Save — ${total} Trips</button></div>`:''}
+  ${todayE.length>0?`<div class="sec">
+    <div class="sec-title">Aaj Saved (${todayE.length})</div>
+    ${todayE.map(t=>`<div class="trip-row">
+      <div class="vpill">${esc(t.vehicleNo)}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">${esc(t.client)}</div><div style="font-size:11px;color:#94a3b8">${esc(t.from)}→${esc(t.to)}</div></div>
+      <div style="font-weight:900;font-size:13px;color:#16a34a">${inr(t.amount)}</div>
+      <button class="btn-del" onclick="delTrip('${t.id}')">${I.del}</button>
+    </div>`).join('')}
+  </div>`:''}`;
+}
+
+function rowHTML(vno,r,i){
+  const cl=clients.find(c=>c.id===r.clientId);
+  const drv=drivers.filter(d=>d.vehicle===vno);
+  return `<div style="padding:10px 12px;border-bottom:1px solid #f1f5f9">
+    <div style="font-size:10px;font-weight:700;color:#cbd5e1;margin-bottom:6px">#${i+1}</div>
+    <div class="row" style="margin-bottom:6px">
+      <div style="flex:1.2"><div class="flbl">Client</div>
+        <select class="fsel" onchange="updCl('${vno}','${r.id}',this.value)">
+          <option value="">— Select —</option>
+          ${clients.map(c=>`<option value="${c.id}" ${r.clientId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
+        </select>
+      </div>
+      ${drv.length?`<div style="flex:1"><div class="flbl">Driver</div>
+        <select class="fsel" onchange="updF('${vno}','${r.id}','driverId',this.value)">
+          <option value="">—</option>
+          ${drv.map(d=>`<option value="${d.id}" ${r.driverId===d.id?'selected':''}>${esc(d.name)}</option>`).join('')}
+        </select>
+      </div>`:''}
+    </div>
+    ${cl?`<div style="margin-bottom:6px"><div class="flbl">Route</div>
+      <select class="fsel" onchange="updRt('${vno}','${r.id}',this.value)">
+        <option value="">— Route —</option>
+        ${cl.routes.map(x=>`<option value="${x.id}" ${r.routeId===x.id?'selected':''}>${esc(x.from)}→${esc(x.to)} (${inr(x.rate)})</option>`).join('')}
+      </select>
+    </div>`:''}
+    <div class="row">
+      <div style="flex:1"><div class="flbl">From</div><input class="finp" value="${esc(r.from)}" oninput="updF('${vno}','${r.id}','from',this.value)" placeholder="Kahan se"></div>
+      <div style="flex:1"><div class="flbl">To</div><input class="finp" value="${esc(r.to)}" oninput="updF('${vno}','${r.id}','to',this.value)" placeholder="Kahan tak"></div>
+      <div style="width:78px"><div class="flbl">₹</div><input class="finp" type="number" value="${r.amount}" oninput="updF('${vno}','${r.id}','amount',this.value)" placeholder="0"></div>
+      <button class="btn-del" style="margin-top:16px;flex-shrink:0" onclick="delRow('${vno}','${r.id}')">${I.del}</button>
+    </div>
+  </div>`;
+}
+
+function getPV(v){return S.pending.find(p=>p.vehicleNo===v);}
+function getR(v,rid){return getPV(v)?.rows.find(r=>r.id===rid);}
+function togV(v){const i=S.pending.findIndex(p=>p.vehicleNo===v);if(i>=0)S.pending.splice(i,1);else S.pending.push({vehicleNo:v,rows:[{id:uid(),clientId:'',routeId:'',driverId:'',from:'',to:'',amount:''}]});render();}
+function updCl(v,rid,val){const r=getR(v,rid);if(!r)return;r.clientId=val;r.routeId='';r.from='';r.to='';r.amount='';render();}
+function updRt(v,rid,val){const r=getR(v,rid);if(!r)return;r.routeId=val;const cl=clients.find(c=>c.id===r.clientId);const rt=cl?.routes.find(x=>x.id===val);if(rt){r.from=rt.from;r.to=rt.to;r.amount=rt.rate;}render();}
+function updF(v,rid,f,val){const r=getR(v,rid);if(r)r[f]=val;}
+function addRow(v){const p=getPV(v);if(p)p.rows.push({id:uid(),clientId:'',routeId:'',driverId:'',from:'',to:'',amount:''});render();}
+function delRow(v,rid){const p=getPV(v);if(!p)return;p.rows=p.rows.filter(r=>r.id!==rid);if(!p.rows.length)p.rows=[{id:uid(),clientId:'',routeId:'',driverId:'',from:'',to:'',amount:''}];render();}
+
+async function saveTrips(){
+  const newT=[];let skip=0;
+  S.pending.forEach(p=>p.rows.forEach(r=>{
+    if(!r.clientId||!String(r.from).trim()||!String(r.to).trim()||!r.amount){skip++;return;}
+    const cl=clients.find(c=>c.id===r.clientId);
+    const drv=drivers.find(d=>d.id===r.driverId);
+    newT.push({date:S.entryDate,vehicleNo:p.vehicleNo,clientId:r.clientId,client:cl?.name||'',routeId:r.routeId||'',driverId:r.driverId||'',driver:drv?.name||'',from:r.from,to:r.to,amount:num(r.amount),payStatus:'unpaid'});
+  }));
+  if(!newT.length){toast('Valid trip bharo!','err');return;}
+  const btn=document.querySelector('.btn.primary.full');if(btn){btn.textContent='Saving...';btn.disabled=true;}
+  for(const t of newT){
+    const ref=await addDoc(userRef('trips'),t);
+    trips.unshift({id:ref.id,...t});
+  }
+  toast('✓ '+newT.length+' trips save!'+(skip?' ('+skip+' skip)':''));
+  S.pending=[];render();
+}
+
+// ── BILLS ──────────────────────────────────────────────────────────────────
+function bRange(){
+  const d=new Date(),{billPeriod:p,billFrom:bf,billTo:bt}=S;
+  if(p==='today')return[today(),today()];
+  if(p==='week'){const s=new Date(d);s.setDate(d.getDate()-6);return[s.toISOString().split('T')[0],today()];}
+  if(p==='month')return[new Date(d.getFullYear(),d.getMonth(),1).toISOString().split('T')[0],today()];
+  return[bf||today(),bt||today()];
+}
+function fTrips(sc,rf,rt){return trips.filter(t=>t.date>=rf&&t.date<=rt&&(sc==='all'||t.clientId===sc)).sort((a,b)=>a.date.localeCompare(b.date));}
+
+function pageBills(){
+  const{billClient:sc,billPeriod:per,billFrom:bf,billTo:bt,billNo,billGst:gst}=S;
+  const[rf,rt]=bRange();const filtered=fTrips(sc,rf,rt);
+  const base=filtered.reduce((s,t)=>s+t.amount,0);
+  const gstAmt=gst?Math.round(base*0.05):0;const grand=base+gstAmt;
+  const byC={};filtered.forEach(t=>{const k=t.clientId||t.client;if(!byC[k])byC[k]={name:t.client,trips:[],total:0};byC[k].trips.push(t);byC[k].total+=t.amount;});
+  return `
+  <div class="phdr"><div class="phdr-title">Bills & Reports</div></div>
+  <div class="fbox">
+    <div class="row" style="margin-bottom:8px">
+      <div style="flex:1.4"><div class="flbl">Client</div>
+        <select class="fsel" onchange="S.billClient=this.value;render()">
+          <option value="all">Sabhi</option>${clients.map(c=>`<option value="${c.id}" ${sc===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div style="flex:1"><div class="flbl">Period</div>
+        <select class="fsel" onchange="S.billPeriod=this.value;render()">
+          ${[['today','Aaj'],['week','Hafte'],['month','Mahine'],['custom','Custom']].map(([v,l])=>`<option value="${v}" ${per===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${per==='custom'?`<div class="row" style="margin-bottom:8px">
+      <div style="flex:1"><div class="flbl">Se</div><input type="date" class="finp" value="${bf}" onchange="S.billFrom=this.value;render()"></div>
+      <div style="flex:1"><div class="flbl">Tak</div><input type="date" class="finp" value="${bt}" onchange="S.billTo=this.value;render()"></div>
+    </div>`:''}
+    <div class="row" style="align-items:flex-end">
+      <div style="flex:1"><div class="flbl">Bill No.</div><input class="finp" value="${esc(billNo)}" oninput="S.billNo=this.value" placeholder="001"></div>
+      <div style="flex:1"><div class="flbl">Type</div><div class="type-btns"><button class="tbtn ${!gst?'on':''}" onclick="S.billGst=false;render()">Non-GST</button><button class="tbtn ${gst?'on':''}" onclick="S.billGst=true;render()">GST</button></div></div>
+    </div>
+  </div>
+  <div class="scards">
+    <div class="sc"><div class="sc-v">${filtered.length}</div><div class="sc-l">Trips</div></div>
+    <div class="sc"><div class="sc-v" style="color:#15803d">${inr(base)}</div><div class="sc-l">Base</div></div>
+    <div class="sc"><div class="sc-v" style="color:#dc2626">${gst?inr(gstAmt):'—'}</div><div class="sc-l">GST</div></div>
+    <div class="sc"><div class="sc-v" style="color:#1d4ed8">${inr(grand)}</div><div class="sc-l">Total</div></div>
+  </div>
+  ${filtered.length>0?`<div class="action-row">
+    <button class="btn primary sm" onclick="openPrint()">${I.ok} Bill Banao</button>
+    <button class="btn wa sm" onclick="waShare()">${I.wa} WhatsApp</button>
+    <button class="btn green sm" onclick="csvExp()">${I.dl} CSV</button>
+  </div>`:''}
+  ${sc==='all'&&Object.keys(byC).length>0?`<div class="sec"><div class="sec-title">Client Wise</div>
+    ${Object.values(byC).map(bc=>`<div class="trip-row">
+      <div class="avatar">${bc.name[0].toUpperCase()}</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:13px">${esc(bc.name)}</div><div style="font-size:11px;color:#94a3b8">${bc.trips.length} trips</div></div>
+      <div style="font-weight:900;font-size:14px;color:#dc2626">${inr(bc.total)}</div>
+    </div>`).join('')}
+  </div>`:''}
+  ${filtered.length>0?`<div class="sec"><div class="sec-title">Detail</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Client</th><th>Route</th><th style="text-align:right">Amt</th></tr></thead>
+      <tbody>${filtered.map((t,i)=>`<tr><td>${i+1}</td><td>${fd(t.date)}</td><td style="font-weight:700;color:#dc2626">${esc(t.vehicleNo)}</td><td>${esc(t.client)}</td><td>${esc(t.from)}→${esc(t.to)}</td><td style="text-align:right;font-weight:700;color:#15803d">${inr(t.amount)}</td></tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="5">Base</td><td style="text-align:right">${inr(base)}</td></tr>${gst?`<tr><td colspan="5" style="color:#dc2626">GST 5%</td><td style="text-align:right;color:#dc2626">${inr(gstAmt)}</td></tr>`:''}<tr><td colspan="5">TOTAL</td><td style="text-align:right">${inr(grand)}</td></tr></tfoot>
+    </table></div>
+  </div>`:`<div class="empty"><div class="empty-e">🔍</div><div>Koi trip nahi</div></div>`}`;
+}
+
+function openPrint(){
+  const[rf,rt]=bRange();const filtered=fTrips(S.billClient,rf,rt);
+  if(!filtered.length){toast('Koi trip nahi','err');return;}
+  S.billPrintData={rf,rt,billNo:S.billNo,gst:S.billGst,filtered};S.showBillPrint=true;render();
+}
+function waShare(){
+  const[rf,rt]=bRange();const filtered=fTrips(S.billClient,rf,rt);
+  if(!filtered.length){toast('Koi data nahi','err');return;}
+  const base=filtered.reduce((s,t)=>s+t.amount,0);const gstAmt=S.billGst?Math.round(base*0.05):0;
+  const byC={};filtered.forEach(t=>{const k=t.client;if(!byC[k])byC[k]={n:k,total:0,c:0};byC[k].total+=t.amount;byC[k].c++;});
+  const lines=[`*Trip Report — ${fd(rf)} se ${fd(rt)}*`,'',...Object.values(byC).map(bc=>`*${bc.n}* (${bc.c} trips) — ${inr(bc.total)}`),'','─────────────',`*Total: ${inr(base)}*`,...(S.billGst?[`GST 5%: ${inr(gstAmt)}`,`*Grand: ${inr(base+gstAmt)}*`]:[])];
+  window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');
+}
+function csvExp(){
+  const[rf,rt]=bRange();const filtered=fTrips(S.billClient,rf,rt);
+  if(!filtered.length){toast('Koi data nahi','err');return;}
+  const csv='#,Tarikh,Vehicle,Client,From,To,Amount\n'+filtered.map((t,i)=>[i+1,fd(t.date),t.vehicleNo,t.client,t.from,t.to,t.amount].join(',')).join('\n');
+  dlFile(csv,'trips.csv','text/csv');toast('✓ CSV download!');
+}
+function dlFile(content,name,type){const a=document.createElement('a');a.href='data:'+type+';charset=utf-8,\uFEFF'+encodeURIComponent(content);a.download=name;a.click();}
+
+// ── BILL PRINT ──────────────────────────────────────────────────────────────
+function pageBillPrint(){
+  const d=S.billPrintData;if(!d)return'';
+  const{rf,rt,billNo,gst,filtered}=d;
+  const base=filtered.reduce((s,t)=>s+t.amount,0);
+  const gstAmt=gst?Math.round(base*0.05):0;const cgst=Math.round(gstAmt/2),sgst=gstAmt-cgst;const grand=base+gstAmt;
+  const cl=filtered[0]?.client||'';const clObj=clients.find(c=>filtered[0]?.clientId===c.id);
+  return `
+  <div class="no-print" style="background:#1e3a5f;padding:12px 14px">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+      <button class="back-btn" onclick="S.showBillPrint=false;render()">${I.back}</button>
+      <span style="color:#fff;font-weight:700;flex:1;font-size:14px">Bill Preview</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn primary sm" style="justify-content:center" onclick="dlBill()">📄 Download HTML</button>
+      <button style="background:#25d366;color:#fff;border:none;border-radius:8px;padding:9px;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;gap:5px" onclick="waBillPDF()">${I.wa} PDF on WhatsApp</button>
+      <button style="background:#ea4335;color:#fff;border:none;border-radius:8px;padding:9px;font-weight:700;font-size:12px" onclick="emailBill()">📧 Email</button>
+      <button style="background:#475569;color:#fff;border:none;border-radius:8px;padding:9px;font-weight:700;font-size:12px" onclick="window.print()">🖨️ Print</button>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.55);text-align:center;margin-top:6px">💡 "PDF on WhatsApp" tap karo → PDF save hoga → WhatsApp share hoga</div>
+  </div>
+  <div style="background:#e2e8f0;padding:8px">
+  <div id="bill-content" style="background:#fff;padding:22px;font-size:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);border-radius:8px">
+    <div style="display:flex;justify-content:space-between;border-bottom:3px solid #1e3a5f;padding-bottom:12px;margin-bottom:12px">
+      <div><div style="font-size:17px;font-weight:900;color:#1e3a5f">${esc(company.name||'Transport Company')}</div>
+      ${company.address?`<div style="font-size:11px;color:#475569;margin-top:2px">${esc(company.address)}${company.city?', '+esc(company.city):''}</div>`:''}
+      ${company.phone?`<div style="font-size:11px">📞 ${esc(company.phone)}</div>`:''}
+      ${company.gst?`<div style="font-weight:700;font-size:11px">GSTIN: ${esc(company.gst)}</div>`:''}
+      ${company.bankName?`<div style="font-size:10px;color:#64748b">Bank: ${esc(company.bankName)} | A/C: ${esc(company.bankAcc)} | IFSC: ${esc(company.bankIFSC)}</div>`:''}
+      </div>
+      <div style="text-align:right"><div style="background:#1e3a5f;color:#fff;padding:4px 10px;border-radius:5px;font-weight:900;font-size:11px;margin-bottom:5px;display:inline-block">${gst?'TAX INVOICE':'TRANSPORT BILL'}</div>
+      <div style="font-size:11px;color:#334155;line-height:1.7"><b>Bill No:</b> ${esc(billNo)}<br><b>Date:</b> ${fd(today())}<br>Period: ${fd(rf)}—${fd(rt)}</div></div>
+    </div>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:7px;margin-bottom:12px">
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:2px">Bill To</div>
+      <div style="font-size:15px;font-weight:800;color:#1e3a5f">${esc(cl)}</div>
+      ${clObj?.gstNo?`<div style="font-size:11px;color:#475569">GSTIN: ${esc(clObj.gstNo)}</div>`:''}
+    </div>
+    <table style="min-width:unset;margin-bottom:12px"><thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Route</th><th>Desc</th>${gst?'<th>HSN</th>':''}<th style="text-align:right">Amt</th></tr></thead>
+    <tbody>${filtered.map((t,i)=>`<tr><td>${i+1}</td><td>${fd(t.date)}</td><td style="font-weight:700;color:#dc2626">${esc(t.vehicleNo)}</td><td>${esc(t.from)}→${esc(t.to)}</td><td style="color:#64748b">Transport</td>${gst?'<td>9965</td>':''}<td style="text-align:right;font-weight:600">${inr(t.amount)}</td></tr>`).join('')}</tbody></table>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:14px"><div style="min-width:200px;border:1px solid #e2e8f0;border-radius:7px;overflow:hidden">
+      <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0"><span style="color:#475569">Sub Total</span><span>${inr(base)}</span></div>
+      ${gst?`<div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0;background:#fff7f7"><span style="color:#dc2626">CGST 2.5%</span><span>${inr(cgst)}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0;background:#fff7f7"><span style="color:#dc2626">SGST 2.5%</span><span>${inr(sgst)}</span></div>`:''}
+      <div style="display:flex;justify-content:space-between;padding:9px 12px;background:#1e3a5f"><span style="font-weight:900;color:#fff;font-size:13px">TOTAL</span><span style="font-weight:900;color:#fcd34d;font-size:14px">${inr(grand)}</span></div>
+    </div></div>
+    <div style="border-top:1px solid #e2e8f0;padding-top:10px;display:flex;justify-content:space-between">
+      <div style="font-size:10px;color:#94a3b8">Thank you for your business!${gst?'<br>HSN 9965':''}</div>
+      <div style="text-align:center"><div style="height:28px;border-bottom:1px solid #334155;width:120px;margin-bottom:3px"></div><div style="font-size:10px;color:#475569">Authorized Signatory</div></div>
+    </div>
+  </div></div>`;
+}
+
+function dlBill(){
+  const d=S.billPrintData;if(!d)return;
+  const{rf,rt,billNo,gst,filtered}=d;
+  const base=filtered.reduce((s,t)=>s+t.amount,0);const gstAmt=gst?Math.round(base*0.05):0;const grand=base+gstAmt;
+  const f=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const r2=n=>'Rs.'+Number(n||0).toLocaleString('en-IN');
+  const d2=s=>{try{const[y,m,dy]=s.split('-');return dy+'/'+m+'/'+y;}catch(e){return s;}};
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill-${billNo}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:20px;font-size:12px}table{width:100%;border-collapse:collapse;margin-bottom:12px}th{background:#1e3a5f;color:#fff;padding:7px;font-size:11px;text-align:left}td{padding:6px 7px;border-bottom:1px solid #f1f5f9}tr:nth-child(even)td{background:#f8fafc}@media print{body{padding:10px}}</style></head><body>
+  <div style="display:flex;justify-content:space-between;border-bottom:3px solid #1e3a5f;padding-bottom:12px;margin-bottom:12px">
+    <div><div style="font-size:17px;font-weight:900;color:#1e3a5f">${f(company.name||'Transport Co.')}</div>
+    ${company.address?`<div style="font-size:11px;color:#475569">${f(company.address)}${company.city?', '+f(company.city):''}</div>`:''}
+    ${company.phone?`<div style="font-size:11px">Ph: ${f(company.phone)}</div>`:''}
+    ${company.gst?`<div style="font-weight:700">GSTIN: ${f(company.gst)}</div>`:''}
+    ${company.bankName?`<div style="font-size:10px;color:#64748b">Bank: ${f(company.bankName)} | A/C: ${f(company.bankAcc)} | IFSC: ${f(company.bankIFSC)}</div>`:''}</div>
+    <div style="text-align:right"><div style="background:#1e3a5f;color:#fff;padding:4px 10px;border-radius:5px;font-weight:900;font-size:11px;display:inline-block;margin-bottom:5px">${gst?'TAX INVOICE':'TRANSPORT BILL'}</div>
+    <div style="font-size:11px;line-height:1.8"><b>Bill No:</b> ${f(billNo)}<br><b>Date:</b> ${d2(today())}<br>Period: ${d2(rf)}—${d2(rt)}</div></div>
+  </div>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:7px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:2px">Bill To</div>
+    <div style="font-size:15px;font-weight:800;color:#1e3a5f">${f(filtered[0]?.client||'')}</div></div>
+  <table><thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Route</th><th>Description</th>${gst?'<th>HSN</th>':''}<th style="text-align:right">Amount</th></tr></thead>
+  <tbody>${filtered.map((t,i)=>`<tr><td>${i+1}</td><td>${d2(t.date)}</td><td style="font-weight:700;color:#dc2626">${f(t.vehicleNo)}</td><td>${f(t.from)}→${f(t.to)}</td><td style="color:#64748b">Transport</td>${gst?'<td>9965</td>':''}<td style="text-align:right;font-weight:600">${r2(t.amount)}</td></tr>`).join('')}</tbody></table>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><div style="min-width:200px;border:1px solid #e2e8f0;border-radius:7px;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0"><span>Sub Total</span><span>${r2(base)}</span></div>
+    ${gst?`<div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0;background:#fff7f7"><span style="color:#dc2626">CGST 2.5%</span><span>${r2(Math.round(gstAmt/2))}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0;background:#fff7f7"><span style="color:#dc2626">SGST 2.5%</span><span>${r2(gstAmt-Math.round(gstAmt/2))}</span></div>`:''}
+    <div style="display:flex;justify-content:space-between;padding:9px 12px;background:#1e3a5f"><span style="font-weight:900;color:#fff;font-size:13px">TOTAL</span><span style="font-weight:900;color:#fcd34d;font-size:14px">${r2(grand)}</span></div>
+  </div></div>
+  <div style="border-top:1px solid #e2e8f0;padding-top:10px;display:flex;justify-content:space-between">
+    <div style="font-size:10px;color:#94a3b8">Thank you!${gst?'<br>HSN 9965':''}</div>
+    <div style="text-align:center"><div style="height:28px;border-bottom:1px solid #334155;width:120px;margin-bottom:3px"></div><div style="font-size:10px">Authorized Signatory</div></div>
+  </div>
+  <script>window.onload=function(){window.print();}<\/script></body></html>`;
+  dlFile(html,'Bill-'+billNo+'-'+filtered[0]?.client+'.html','text/html');
+  toast('📄 Download → Print → Save as PDF → WhatsApp pe bhejo!','info');
+}
+
+function waBillPDF(){
+  const d=S.billPrintData;if(!d)return;
+  const{rf,rt,billNo,gst,filtered}=d;
+  const base=filtered.reduce((s,t)=>s+t.amount,0);const gstAmt=gst?Math.round(base*0.05):0;const grand=base+gstAmt;
+  const f=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const r2=n=>'Rs.'+Number(n||0).toLocaleString('en-IN');
+  const d2=s=>{try{const[y,m,dy]=s.split('-');return dy+'/'+m+'/'+y;}catch(e){return s;}};
+  // Generate printable HTML and open it so user can print->save PDF->share
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill-${billNo}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:20px;font-size:12px}table{width:100%;border-collapse:collapse;margin-bottom:12px}th{background:#1e3a5f;color:#fff;padding:7px;font-size:11px;text-align:left}td{padding:6px 7px;border-bottom:1px solid #f1f5f9}tr:nth-child(even)td{background:#f8fafc}.wa-guide{background:#e7f9ef;border:2px solid #25d366;border-radius:10px;padding:14px;margin-bottom:16px;font-family:Arial;text-align:center}.wa-guide h2{color:#128c42;font-size:16px;margin-bottom:8px}.wa-guide ol{text-align:left;padding-left:20px;line-height:2;color:#1a5c35;font-size:13px}@media print{.wa-guide{display:none}body{padding:10px}}</style>
+  <script>window.onload=function(){
+    var isMobile=/Android|iPhone|iPad/i.test(navigator.userAgent);
+    if(isMobile){document.getElementById('guide').innerHTML='<h2>✅ Steps:</h2><ol><li>Neeche Share button dabao</li><li>"Print" select karo</li><li>"Save as PDF" choose karo</li><li>PDF save hone ke baad WhatsApp pe bhejo</li></ol>';}
+    else{document.getElementById('guide').innerHTML='<h2>✅ Steps:</h2><ol><li>Ctrl+P (Print) dabao</li><li>Destination: "Save as PDF" karo</li><li>PDF save karo</li><li>WhatsApp Web pe bhejo</li></ol>';}
+    setTimeout(()=>window.print(),800);
+  }<\/script></head><body>
+  <div class="wa-guide"><div id="guide"><h2>📤 PDF banao aur WhatsApp pe bhejo</h2></div></div>
+  <div style="display:flex;justify-content:space-between;border-bottom:3px solid #1e3a5f;padding-bottom:12px;margin-bottom:12px">
+    <div><div style="font-size:17px;font-weight:900;color:#1e3a5f">${f(company.name||'Transport Co.')}</div>
+    ${company.address?`<div style="font-size:11px;color:#475569">${f(company.address)}${company.city?', '+f(company.city):''}</div>`:''}
+    ${company.phone?`<div style="font-size:11px">Ph: ${f(company.phone)}</div>`:''}
+    ${company.gst?`<div style="font-weight:700">GSTIN: ${f(company.gst)}</div>`:''}
+    ${company.bankName?`<div style="font-size:10px;color:#64748b">Bank: ${f(company.bankName)} | A/C: ${f(company.bankAcc)} | IFSC: ${f(company.bankIFSC)}</div>`:''}</div>
+    <div style="text-align:right"><div style="background:#1e3a5f;color:#fff;padding:4px 10px;border-radius:5px;font-weight:900;font-size:11px;display:inline-block;margin-bottom:5px">${gst?'TAX INVOICE':'TRANSPORT BILL'}</div>
+    <div style="font-size:11px;line-height:1.8"><b>Bill No:</b> ${f(billNo)}<br><b>Date:</b> ${d2(today())}<br>Period: ${d2(rf)}—${d2(rt)}</div></div>
+  </div>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;padding:8px 12px;border-radius:7px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:2px">Bill To</div>
+    <div style="font-size:15px;font-weight:800;color:#1e3a5f">${f(filtered[0]?.client||'')}</div></div>
+  <table><thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Route</th><th>Description</th>${gst?'<th>HSN</th>':''}<th style="text-align:right">Amount</th></tr></thead>
+  <tbody>${filtered.map((t,i)=>`<tr><td>${i+1}</td><td>${d2(t.date)}</td><td style="font-weight:700;color:#dc2626">${f(t.vehicleNo)}</td><td>${f(t.from)}→${f(t.to)}</td><td style="color:#64748b">Transport</td>${gst?'<td>9965</td>':''}<td style="text-align:right;font-weight:600">${r2(t.amount)}</td></tr>`).join('')}</tbody></table>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px"><div style="min-width:200px;border:1px solid #e2e8f0;border-radius:7px;overflow:hidden">
+    <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0"><span>Sub Total</span><span>${r2(base)}</span></div>
+    ${gst?`<div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0;background:#fff7f7"><span style="color:#dc2626">CGST 2.5%</span><span>${r2(Math.round(gstAmt/2))}</span></div>
+    <div style="display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px solid #e2e8f0;background:#fff7f7"><span style="color:#dc2626">SGST 2.5%</span><span>${r2(gstAmt-Math.round(gstAmt/2))}</span></div>`:''}
+    <div style="display:flex;justify-content:space-between;padding:9px 12px;background:#1e3a5f"><span style="font-weight:900;color:#fff;font-size:13px">TOTAL</span><span style="font-weight:900;color:#fcd34d;font-size:14px">${r2(grand)}</span></div>
+  </div></div>
+  <div style="border-top:1px solid #e2e8f0;padding-top:10px;display:flex;justify-content:space-between">
+    <div style="font-size:10px;color:#94a3b8">Thank you!${gst?'<br>HSN 9965':''}</div>
+    <div style="text-align:center"><div style="height:28px;border-bottom:1px solid #334155;width:120px;margin-bottom:3px"></div><div style="font-size:10px">Authorized Signatory</div></div>
+  </div>
+  </body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const win=window.open(url,'_blank');
+  if(!win){
+    // fallback: download + open wa
+    dlFile(html,'Bill-'+billNo+'.html','text/html');
+    setTimeout(()=>{window.open('https://wa.me/','_blank');},1000);
+  }
+  toast('📄 Page khula → Print → Save as PDF → WhatsApp pe bhejo!','info');
+}
+function waBill(){
+  const d=S.billPrintData;if(!d)return;
+  const{rf,rt,billNo,gst,filtered}=d;
+  const base=filtered.reduce((s,t)=>s+t.amount,0);const gstAmt=gst?Math.round(base*0.05):0;
+  const d2=s=>{try{const[y,m,dy]=s.split('-');return dy+'/'+m+'/'+y;}catch(e){return s;}};
+  const lines=[`*${gst?'Tax Invoice':'Transport Bill'} — ${company.name||'Transport Co.'}*`,`Bill No: ${billNo} | Date: ${d2(today())}`,`Period: ${d2(rf)}—${d2(rt)} | Client: ${filtered[0]?.client||''}`,'─────────────────',...filtered.map((t,i)=>`${i+1}. ${d2(t.date)} | ${t.vehicleNo} | ${t.from}→${t.to} | ${inr(t.amount)}`),'─────────────────',`Sub Total: ${inr(base)}`,...(gst?[`GST 5%: ${inr(gstAmt)}`]:[]),`*TOTAL: ${inr(base+gstAmt)}*`];
+  window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');
+}
+function emailBill(){
+  const d=S.billPrintData;if(!d)return;
+  const{rf,rt,billNo,gst,filtered}=d;
+  const base=filtered.reduce((s,t)=>s+t.amount,0);const gstAmt=gst?Math.round(base*0.05):0;
+  const d2=s=>{try{const[y,m,dy]=s.split('-');return dy+'/'+m+'/'+y;}catch(e){return s;}};
+  const sub=`${gst?'Tax Invoice':'Bill'} #${billNo} — ${filtered[0]?.client||''}`;
+  const body=[`Dear ${filtered[0]?.client||''},`,``,`Bill No: ${billNo} | Period: ${d2(rf)} to ${d2(rt)}`,``,'TRIPS:',...filtered.map((t,i)=>`${i+1}. ${d2(t.date)} | ${t.vehicleNo} | ${t.from}→${t.to} | Rs.${t.amount}`),``,`Total: Rs.${base+gstAmt}`,``,`Regards,`,company.name||''].filter(Boolean).join('\n');
+  window.location.href=`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+}
+
+// ── CASH ──────────────────────────────────────────────────────────────────
+const CATS=[{v:'driver_cash',l:'Driver Cash',e:'💵'},{v:'fuel',l:'Fuel/Diesel',e:'⛽'},{v:'repair',l:'Repair',e:'🔧'},{v:'toll',l:'Toll/Tax',e:'🛣️'},{v:'loading',l:'Loading',e:'📦'},{v:'other',l:'Other',e:'📋'}];
+
+function pageCash(){
+  const{cashDate,cashCat,cashSelV,cashAmt,cashDesc,cashMonth,showCashForm}=S;
+  const filtE=expenses.filter(e=>e.date.startsWith(cashMonth));
+  const totalE=filtE.reduce((s,e)=>s+e.amount,0);
+  const byCat={};filtE.forEach(e=>{if(!byCat[e.category])byCat[e.category]={total:0,count:0};byCat[e.category].total+=e.amount;byCat[e.category].count++;});
+  return `
+  <div class="phdr"><div class="phdr-title" style="flex:1">Cash Book</div><button class="hadd-btn" onclick="S.showCashForm=!S.showCashForm;render()">${I.plus} Add</button></div>
+  <div class="fbox" style="display:flex;gap:8px;align-items:flex-end">
+    <div style="flex:1"><div class="flbl">Month</div><input type="month" class="finp" value="${cashMonth}" onchange="S.cashMonth=this.value;render()"></div>
+    <div style="background:#7c3aed;color:#fff;border-radius:10px;padding:9px 12px;text-align:center;min-width:90px"><div style="font-weight:900;font-size:14px">${inr(totalE)}</div><div style="font-size:9px;opacity:.8;text-transform:uppercase">Kharcha</div></div>
+    <button class="btn green sm" onclick="expCSV()">${I.dl}</button>
+  </div>
+  ${Object.keys(byCat).length>0?`<div class="sec" style="padding-bottom:4px"><div class="sec-title">Category</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      ${CATS.filter(c=>byCat[c.v]).map(c=>`<div style="background:#fff;border-radius:10px;padding:8px 12px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:3px solid #7c3aed">
+        <div style="font-size:12px">${c.e} <span style="font-weight:700">${c.l}</span></div>
+        <div style="font-weight:900;font-size:14px;color:#dc2626;margin-top:2px">${inr(byCat[c.v].total)}</div>
+        <div style="font-size:10px;color:#94a3b8">${byCat[c.v].count} entries</div>
+      </div>`).join('')}
+    </div>
+  </div>`:''}
+  ${showCashForm?`<div class="card" style="margin:8px 14px">
+    <div style="font-weight:800;font-size:15px;margin-bottom:12px">Naya Kharcha</div>
+    <div class="row" style="margin-bottom:8px">
+      <div style="flex:1"><div class="flbl">Tarikh</div><input type="date" class="finp" value="${cashDate}" onchange="S.cashDate=this.value"></div>
+      <div style="flex:1"><div class="flbl">Category</div><select class="fsel" onchange="S.cashCat=this.value">${CATS.map(c=>`<option value="${c.v}" ${cashCat===c.v?'selected':''}>${c.e} ${c.l}</option>`).join('')}</select></div>
+    </div>
+    <div style="margin-bottom:8px"><div class="flbl">Vehicle (optional)</div>
+      <div class="chip-wrap" style="margin-top:4px">${vehicles.map(v=>`<div class="chip ${cashSelV.includes(v)?'on':''}" style="font-size:11px;padding:4px 8px" onclick="togCV('${v}')">${cashSelV.includes(v)?I.ok+' ':''}${esc(v)}</div>`).join('')}</div>
+      ${cashSelV.length>0?`<div style="font-size:11px;color:#16a34a;margin-top:4px;font-weight:700">${cashSelV.length} × ${inr(num(cashAmt))} = ${inr(num(cashAmt)*cashSelV.length)}</div>`:''}
+    </div>
+    <div class="row" style="margin-bottom:10px">
+      <div style="flex:1"><div class="flbl">Amount ₹</div><input class="finp" type="number" value="${cashAmt}" oninput="S.cashAmt=this.value" placeholder="0"></div>
+      <div style="flex:1"><div class="flbl">Note</div><input class="finp" value="${esc(cashDesc)}" oninput="S.cashDesc=this.value" placeholder="Driver naam..."></div>
+    </div>
+    <div class="row"><button class="btn primary" onclick="doSaveExp()">${I.ok} Save</button><button class="btn gray" onclick="S.showCashForm=false;render()">Cancel</button></div>
+  </div>`:''}
+  <div class="sec"><div class="sec-title">Entries (${filtE.length})</div>
+    ${filtE.length===0?`<div class="empty"><div class="empty-e">💸</div><div>Koi kharcha nahi</div></div>`:''}
+    ${filtE.map(e=>{const c=CATS.find(x=>x.v===e.category)||CATS[5];return`<div class="trip-row" style="border-left:3px solid #7c3aed">
+      <span style="font-size:18px">${c.e}</span>
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">${esc(e.desc||c.l)}</div><div style="font-size:11px;color:#94a3b8">${fd(e.date)}${e.vehicle?' · '+esc(e.vehicle):''}</div></div>
+      <span style="font-weight:900;font-size:14px;color:#7c3aed">${inr(e.amount)}</span>
+      <button class="btn-del" onclick="delExpense('${e.id}')" style="margin-left:4px">${I.del}</button>
+    </div>`;}).join('')}
+  </div>`;
+}
+
+function togCV(v){S.cashSelV=S.cashSelV.includes(v)?S.cashSelV.filter(x=>x!==v):[...S.cashSelV,v];render();}
+async function doSaveExp(){
+  const{cashDate,cashCat,cashSelV,cashAmt,cashDesc}=S;
+  if(!cashAmt||num(cashAmt)<=0){toast('Amount daalein','err');return;}
+  const cl=CATS.find(c=>c.v===cashCat)||CATS[5];
+  const entries=cashSelV.length>0?cashSelV.map(v=>({date:cashDate,category:cashCat,vehicle:v,desc:cashDesc||cl.l,amount:num(cashAmt)})):[{date:cashDate,category:cashCat,vehicle:'',desc:cashDesc||cl.l,amount:num(cashAmt)}];
+  for(const e of entries) await saveExpense(e);
+  toast('✓ '+entries.length+' entry save!');
+  S.cashAmt='';S.cashDesc='';S.cashSelV=[];S.showCashForm=false;render();
+}
+function expCSV(){
+  const filtE=expenses.filter(e=>e.date.startsWith(S.cashMonth));
+  if(!filtE.length){toast('Koi data nahi','err');return;}
+  const csv='Tarikh,Category,Vehicle,Description,Amount\n'+filtE.map(e=>[fd(e.date),e.category,e.vehicle||'',e.desc,e.amount].join(',')).join('\n');
+  dlFile(csv,'expenses.csv','text/csv');toast('✓ CSV!');
+}
+
+// ── P&L ──────────────────────────────────────────────────────────────────
+function pagePL(){
+  const months=[];const d=new Date();
+  for(let i=5;i>=0;i--){const dd=new Date(d.getFullYear(),d.getMonth()-i,1);months.push({key:`${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}`,lbl:monthName(dd.getMonth())});}
+  const mData=months.map(m=>{const rev=trips.filter(t=>t.date.startsWith(m.key)).reduce((s,t)=>s+t.amount,0);const exp=expenses.filter(e=>e.date.startsWith(m.key)).reduce((s,e)=>s+e.amount,0);return{...m,rev,exp,net:rev-exp};});
+  const maxV=Math.max(...mData.map(m=>Math.max(m.rev,m.exp)),1);
+  const curKey=S.plMonth;
+  const plView=S.plView||'monthly';
+
+  // ── MONTHLY view ──
+  const curRev=trips.filter(t=>t.date.startsWith(curKey)).reduce((s,t)=>s+t.amount,0);
+  const curExp=expenses.filter(e=>e.date.startsWith(curKey)).reduce((s,e)=>s+e.amount,0);
+  const curNet=curRev-curExp;
+  const vehData={};trips.filter(t=>t.date.startsWith(curKey)).forEach(t=>{if(!vehData[t.vehicleNo])vehData[t.vehicleNo]={trips:0,rev:0};vehData[t.vehicleNo].trips++;vehData[t.vehicleNo].rev+=t.amount;});
+  const drvData={};trips.filter(t=>t.date.startsWith(curKey)&&t.driver).forEach(t=>{if(!drvData[t.driver])drvData[t.driver]={trips:0,rev:0};drvData[t.driver].trips++;drvData[t.driver].rev+=t.amount;});
+
+  // ── WEEKLY view — last 7 days ──
+  const weekDays=[];for(let i=6;i>=0;i--){const dd=new Date(Date.now()-i*864e5);weekDays.push(dd.toISOString().split('T')[0]);}
+  const weekData=weekDays.map(date=>{const rev=trips.filter(t=>t.date===date).reduce((s,t)=>s+t.amount,0);const exp=expenses.filter(e=>e.date===date).reduce((s,e)=>s+e.amount,0);const lbl=new Date(date).toLocaleDateString('en-IN',{weekday:'short'});return{date,lbl,rev,exp,net:rev-exp};});
+  const weekMaxV=Math.max(...weekData.map(w=>Math.max(w.rev,w.exp)),1);
+  const weekRev=weekData.reduce((s,w)=>s+w.rev,0);const weekExp=weekData.reduce((s,w)=>s+w.exp,0);
+
+  // ── DAILY view — today ──
+  const todayDate=today();
+  const dayRev=trips.filter(t=>t.date===todayDate).reduce((s,t)=>s+t.amount,0);
+  const dayExp=expenses.filter(e=>e.date===todayDate).reduce((s,e)=>s+e.amount,0);
+  const dayTrips=trips.filter(t=>t.date===todayDate);
+
+  return `
+  <div class="phdr"><div class="phdr-title">P&L Report 📊</div></div>
+  <div style="display:flex;gap:0;background:#fff;border-bottom:2px solid #f1f5f9">
+    ${[['daily','Aaj'],['weekly','Hafte'],['monthly','Mahine']].map(([v,l])=>`<button onclick="S.plView='${v}';render()" style="flex:1;padding:10px 4px;border:none;background:${plView===v?'linear-gradient(135deg,#1e40af,#f97316)':'#fff'};color:${plView===v?'#fff':'#64748b'};font-weight:${plView===v?900:600};font-size:13px;border-bottom:3px solid ${plView===v?'#f97316':'transparent'}">${l}</button>`).join('')}
+  </div>
+
+  ${plView==='daily'?`
+  <div class="scards">
+    <div class="sc"><div class="sc-v" style="color:#15803d">${inr(dayRev)}</div><div class="sc-l">Aaj Kamai</div></div>
+    <div class="sc"><div class="sc-v" style="color:#dc2626">${inr(dayExp)}</div><div class="sc-l">Kharcha</div></div>
+    <div class="sc"><div class="sc-v" style="color:${dayRev-dayExp>=0?'#15803d':'#dc2626'}">${inr(dayRev-dayExp)}</div><div class="sc-l">Net</div></div>
+    <div class="sc"><div class="sc-v">${dayTrips.length}</div><div class="sc-l">Trips</div></div>
+  </div>
+  <div style="padding:10px 14px"><div class="sec-title">Aaj (${fd(todayDate)})</div>
+  ${dayTrips.length===0?`<div class="empty"><div class="empty-e">📊</div><div>Aaj koi trip nahi</div></div>`:''}
+  ${dayTrips.map(t=>`<div class="trip-row">
+    <div class="vpill">${esc(t.vehicleNo)}</div>
+    <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">${esc(t.client)}</div><div style="font-size:11px;color:#94a3b8">${esc(t.from)}→${esc(t.to)}</div></div>
+    <div style="font-weight:900;font-size:13px;color:#16a34a">${inr(t.amount)}</div>
+  </div>`).join('')}
+  </div>
+  `:''}
+
+  ${plView==='weekly'?`
+  <div class="scards">
+    <div class="sc"><div class="sc-v" style="color:#15803d">${inr(weekRev)}</div><div class="sc-l">7-Din Kamai</div></div>
+    <div class="sc"><div class="sc-v" style="color:#dc2626">${inr(weekExp)}</div><div class="sc-l">Kharcha</div></div>
+    <div class="sc"><div class="sc-v" style="color:${weekRev-weekExp>=0?'#15803d':'#dc2626'}">${inr(weekRev-weekExp)}</div><div class="sc-l">Net</div></div>
+  </div>
+  <div style="padding:10px 14px">
+    <div class="sec-title">7 Din Chart</div>
+    <div class="bar-chart">
+      ${weekData.map(w=>`<div class="bar-col">
+        <div style="font-size:8px;font-weight:800;color:${w.net>=0?'#15803d':'#dc2626'}">${w.rev>0?'+'+inr(w.rev).replace('₹',''):''}</div>
+        <div style="display:flex;gap:2px;align-items:flex-end;flex:1;width:100%">
+          <div class="bar" style="flex:1;height:${Math.round((w.rev/weekMaxV)*90)}px;background:#f97316;opacity:.9"></div>
+          <div class="bar" style="flex:1;height:${Math.round((w.exp/weekMaxV)*90)}px;background:#dc2626;opacity:.8"></div>
+        </div>
+        <div class="bar-lbl">${w.lbl}</div>
+      </div>`).join('')}
+    </div>
+  </div>
+  <div class="sec"><div class="sec-title">Din-Vaar Summary</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Din</th><th style="text-align:right">Kamai</th><th style="text-align:right">Kharcha</th><th style="text-align:right">Net</th></tr></thead>
+    <tbody>${weekData.map(w=>`<tr><td><b>${w.lbl}</b><br><span style="font-size:10px;color:#94a3b8">${fd(w.date)}</span></td><td style="text-align:right;color:#15803d">${inr(w.rev)}</td><td style="text-align:right;color:#dc2626">${inr(w.exp)}</td><td style="text-align:right;font-weight:700;color:${w.net>=0?'#15803d':'#dc2626'}">${inr(w.net)}</td></tr>`).join('')}</tbody>
+    </table></div>
+  </div>
+  `:''}
+
+  ${plView==='monthly'?`
+  <div class="fbox" style="display:flex;gap:8px;align-items:flex-end">
+    <div style="flex:1"><div class="flbl">Month</div><input type="month" class="finp" value="${S.plMonth}" onchange="S.plMonth=this.value;render()"></div>
+    <button class="btn green sm" onclick="plCSV()">${I.dl}</button>
+    <button class="btn wa sm" onclick="plWA()">${I.wa}</button>
+  </div>
+  <div class="scards">
+    <div class="sc"><div class="sc-v" style="color:#15803d">${inr(curRev)}</div><div class="sc-l">Kamai</div></div>
+    <div class="sc"><div class="sc-v" style="color:#dc2626">${inr(curExp)}</div><div class="sc-l">Kharcha</div></div>
+    <div class="sc"><div class="sc-v" style="color:${curNet>=0?'#15803d':'#dc2626'}">${inr(curNet)}</div><div class="sc-l">Net Profit</div></div>
+    <div class="sc"><div class="sc-v">${trips.filter(t=>t.date.startsWith(curKey)).length}</div><div class="sc-l">Trips</div></div>
+  </div>
+  <div style="padding:10px 14px">
+    <div class="sec-title">6 Mahine Chart</div>
+    <div class="bar-chart">
+      ${mData.map(m=>`<div class="bar-col">
+        <div style="font-size:8px;font-weight:800;color:${m.net>=0?'#15803d':'#dc2626'}">${m.net>=0?'+':'-'}${inr(Math.abs(m.net)).replace('₹','')}</div>
+        <div style="display:flex;gap:2px;align-items:flex-end;flex:1;width:100%">
+          <div class="bar" style="flex:1;height:${Math.round((m.rev/maxV)*90)}px;background:#f97316;opacity:.85"></div>
+          <div class="bar" style="flex:1;height:${Math.round((m.exp/maxV)*90)}px;background:#dc2626;opacity:.8"></div>
+        </div>
+        <div class="bar-lbl">${m.lbl}</div>
+      </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:12px;margin-top:6px;justify-content:center">
+      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#475569"><div style="width:10px;height:10px;background:#f97316;border-radius:2px"></div>Kamai</div>
+      <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#475569"><div style="width:10px;height:10px;background:#dc2626;border-radius:2px"></div>Kharcha</div>
+    </div>
+  </div>
+  ${Object.keys(vehData).length?`<div class="sec"><div class="sec-title">Vehicle Wise</div>${Object.entries(vehData).map(([v,d])=>`<div class="trip-row"><div class="vpill">${esc(v)}</div><div style="flex:1"><div style="font-weight:700">${d.trips} trips</div></div><div style="font-weight:900;color:#16a34a">${inr(d.rev)}</div></div>`).join('')}</div>`:''}
+  ${Object.keys(drvData).length?`<div class="sec"><div class="sec-title">Driver Wise</div>${Object.entries(drvData).map(([n,d])=>`<div class="trip-row"><div class="avatar">${n[0].toUpperCase()}</div><div style="flex:1"><div style="font-weight:700">${esc(n)}</div><div style="font-size:11px;color:#94a3b8">${d.trips} trips</div></div><div style="font-weight:900;color:#16a34a">${inr(d.rev)}</div></div>`).join('')}</div>`:''}
+  <div class="sec"><div class="sec-title">6 Mahine Summary</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Month</th><th style="text-align:right">Kamai</th><th style="text-align:right">Kharcha</th><th style="text-align:right">Net</th></tr></thead>
+    <tbody>${mData.map(m=>`<tr><td><b>${m.lbl}</b></td><td style="text-align:right;color:#15803d">${inr(m.rev)}</td><td style="text-align:right;color:#dc2626">${inr(m.exp)}</td><td style="text-align:right;font-weight:700;color:${m.net>=0?'#15803d':'#dc2626'}">${inr(m.net)}</td></tr>`).join('')}</tbody>
+    </table></div>
+  </div>
+  `:''}`;
+}
+
+function plCSV(){const curKey=S.plMonth;const filtT=trips.filter(t=>t.date.startsWith(curKey));const csv='#,Tarikh,Vehicle,Driver,Client,From,To,Amount\n'+filtT.map((t,i)=>[i+1,fd(t.date),t.vehicleNo,t.driver||'',t.client,t.from,t.to,t.amount].join(',')).join('\n');dlFile(csv,'pl-'+curKey+'.csv','text/csv');toast('✓ CSV!');}
+function plPDF(){
+  const k=S.plMonth;
+  const [yr,mo]=k.split('-');
+  const mName=new Date(yr,mo-1,1).toLocaleString('hi-IN',{month:'long',year:'numeric'});
+  const rev=trips.filter(t=>t.date.startsWith(k)).reduce((s,t)=>s+t.amount,0);
+  const exp=expenses.filter(e=>e.date.startsWith(k)).reduce((s,e)=>s+e.amount,0);
+  const net=rev-exp;
+  const tripList=trips.filter(t=>t.date.startsWith(k));
+  const expList=expenses.filter(e=>e.date.startsWith(k));
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>P&L ${k}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;padding:20px;font-size:12px;color:#1e293b}
+  h1{font-size:20px;color:#1e3a5f;margin-bottom:4px}h2{font-size:14px;color:#475569;margin:14px 0 6px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+  .card{border-radius:10px;padding:12px;text-align:center}.card .v{font-size:18px;font-weight:900;margin-bottom:2px}.card .l{font-size:11px;color:#64748b}
+  table{width:100%;border-collapse:collapse;margin-bottom:14px}th{background:#1e3a5f;color:#fff;padding:7px;text-align:left;font-size:11px}
+  td{padding:6px 7px;border-bottom:1px solid #f1f5f9;font-size:11px}tr:nth-child(even)td{background:#f8fafc}
+  .footer{text-align:center;color:#94a3b8;font-size:10px;margin-top:20px;border-top:1px solid #e2e8f0;padding-top:10px}
+  @media print{body{padding:10px}}</style>
+  <script>window.onload=()=>setTimeout(()=>window.print(),500)<\/script></head><body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;border-bottom:3px solid #1e3a5f;padding-bottom:12px">
+    <div><h1>${company.name||'Transport Co.'} 🚛</h1><div style="font-size:13px;color:#475569">P&L Report — ${mName}</div></div>
+    <div style="text-align:right;font-size:11px;color:#64748b">Print Date: ${new Date().toLocaleDateString('en-IN')}</div>
+  </div>
+  <div class="cards">
+    <div class="card" style="background:#f0fdf4"><div class="v" style="color:#16a34a">${inr(rev)}</div><div class="l">Total Kamai</div></div>
+    <div class="card" style="background:#fef2f2"><div class="v" style="color:#dc2626">${inr(exp)}</div><div class="l">Total Kharcha</div></div>
+    <div class="card" style="background:${net>=0?'#eff6ff':'#fff7ed'}"><div class="v" style="color:${net>=0?'#1e40af':'#ea580c'}">${inr(net)}</div><div class="l">Net ${net>=0?'Profit':'Loss'}</div></div>
+  </div>
+  <h2>Trip Details (${tripList.length} trips)</h2>
+  <table><thead><tr><th>#</th><th>Date</th><th>Vehicle</th><th>Client</th><th>Route</th><th style="text-align:right">Amount</th></tr></thead>
+  <tbody>${tripList.map((t,i)=>`<tr><td>${i+1}</td><td>${fd(t.date)}</td><td><b>${t.vehicleNo}</b></td><td>${t.client||''}</td><td>${t.from||''}→${t.to||''}</td><td style="text-align:right;font-weight:700;color:#16a34a">${inr(t.amount)}</td></tr>`).join('')}</tbody></table>
+  <h2>Expenses (${expList.length})</h2>
+  <table><thead><tr><th>#</th><th>Date</th><th>Category</th><th>Vehicle</th><th>Description</th><th style="text-align:right">Amount</th></tr></thead>
+  <tbody>${expList.map((e,i)=>`<tr><td>${i+1}</td><td>${fd(e.date)}</td><td>${e.category||''}</td><td>${e.vehicle||''}</td><td>${e.desc||''}</td><td style="text-align:right;font-weight:700;color:#dc2626">${inr(e.amount)}</td></tr>`).join('')}</tbody></table>
+  <div class="footer">${company.name||'Transport Co.'} · Generated by Trip Ledger Pro</div>
+  </body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  window.open(url,'_blank');
+  toast('📄 Page khula → Print → Save as PDF!','info');
+}
+function plWA(){const k=S.plMonth;const rev=trips.filter(t=>t.date.startsWith(k)).reduce((s,t)=>s+t.amount,0);const exp=expenses.filter(e=>e.date.startsWith(k)).reduce((s,e)=>s+e.amount,0);const lines=[`*P&L — ${k}*`,`✅ Kamai: ${inr(rev)}`,`❌ Kharcha: ${inr(exp)}`,`*Net: ${inr(rev-exp)}*`];window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');}
+
+// ── PAYMENTS ──────────────────────────────────────────────────────────────
+function getPayStatus(){
+  return clients.map(c=>{
+    const cT=trips.filter(t=>t.clientId===c.id);
+    const total=cT.reduce((s,t)=>s+t.amount,0);
+    const paid=payments.filter(p=>p.clientId===c.id).reduce((s,p)=>s+p.amount,0);
+    const pending=Math.max(0,total-paid);
+    const status=pending===0?'paid':paid>0?'partial':'unpaid';
+    return{clientId:c.id,clientName:c.name,total,paid,pending,status,trips:cT.length};
+  }).filter(p=>p.trips>0);
+}
+
+function pagePayments(){
+  const ps=getPayStatus();
+  const totalPending=ps.filter(p=>p.status!=='paid').reduce((s,p)=>s+p.pending,0);
+  return `
+  <div class="phdr"><div class="phdr-title">Payment Tracker 💳</div></div>
+  <div class="scards">
+    <div class="sc"><div class="sc-v" style="color:#dc2626">${inr(totalPending)}</div><div class="sc-l">Bakaya</div></div>
+    <div class="sc"><div class="sc-v" style="color:#15803d">${inr(ps.reduce((s,p)=>s+p.paid,0))}</div><div class="sc-l">Mila</div></div>
+    <div class="sc"><div class="sc-v">${ps.filter(p=>p.status==='unpaid').length}</div><div class="sc-l">Unpaid</div></div>
+    <div class="sc"><div class="sc-v">${ps.filter(p=>p.status==='paid').length}</div><div class="sc-l">Paid</div></div>
+  </div>
+  <div class="sec">
+    ${ps.length===0?`<div class="empty"><div class="empty-e">💳</div><div>Koi data nahi</div></div>`:''}
+    ${ps.map(p=>`<div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="avatar">${p.clientName[0].toUpperCase()}</div>
+        <div style="flex:1"><div style="font-weight:800;font-size:14px">${esc(p.clientName)}</div><div style="font-size:11px;color:#94a3b8">${p.trips} trips</div></div>
+        <span class="${p.status==='paid'?'paid-badge':p.status==='partial'?'partial-badge':'unpaid-badge'}">${p.status==='paid'?'✓ Paid':p.status==='partial'?'Partial':'Unpaid'}</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <div style="flex:1;text-align:center;background:#f8fafc;border-radius:8px;padding:7px"><div style="font-size:12px;font-weight:900">${inr(p.total)}</div><div style="font-size:10px;color:#94a3b8">Total</div></div>
+        <div style="flex:1;text-align:center;background:#f0fdf4;border-radius:8px;padding:7px"><div style="font-size:12px;font-weight:900;color:#15803d">${inr(p.paid)}</div><div style="font-size:10px;color:#94a3b8">Mila</div></div>
+        <div style="flex:1;text-align:center;background:#fef2f2;border-radius:8px;padding:7px"><div style="font-size:12px;font-weight:900;color:#dc2626">${inr(p.pending)}</div><div style="font-size:10px;color:#94a3b8">Bakaya</div></div>
+      </div>
+      ${p.status!=='paid'?`<div class="row"><button class="btn primary sm" style="flex:1;justify-content:center" onclick="S.payModal={clientId:'${p.clientId}',clientName:'${esc(p.clientName)}',total:${p.total},paid:${p.paid},pending:${p.pending}};render()">${I.plus} Payment Add</button>
+      <button class="btn wa sm" onclick="payWA('${esc(p.clientName)}',${p.pending})">${I.wa} Remind</button></div>`:''}
+      ${payments.filter(pay=>pay.clientId===p.clientId).slice(0,3).map(pay=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #f1f5f9;font-size:12px">
+        <span style="color:#94a3b8">${fd(pay.date)}</span><span style="flex:1;color:#475569">${esc(pay.note||'Payment')}</span>
+        <span style="font-weight:700;color:#15803d">${inr(pay.amount)}</span>
+        <button class="btn-del" onclick="delPayment('${pay.id}')">${I.del}</button>
+      </div>`).join('')}
+    </div>`).join('')}
+  </div>`;
+}
+
+function pagePayModal(){
+  const{clientId,clientName,pending}=S.payModal;
+  return `<div style="position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;display:flex;align-items:flex-end">
+  <div style="background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:640px;margin:0 auto;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))">
+    <div style="font-weight:800;font-size:16px;margin-bottom:4px">Payment Record</div>
+    <div style="font-size:13px;color:#64748b;margin-bottom:16px">${esc(clientName)} — Bakaya: ${inr(pending)}</div>
+    <div class="fgrp"><div class="flbl">Tarikh</div><input type="date" class="finp" id="pm-date" value="${today()}"></div>
+    <div class="fgrp"><div class="flbl">Amount ₹</div><input class="finp" type="number" id="pm-amt" value="${pending}" placeholder="0"></div>
+    <div class="fgrp"><div class="flbl">Note</div><input class="finp" id="pm-note" placeholder="Cash/UPI/Cheque..."></div>
+    <div class="row">
+      <button class="btn primary" style="flex:1;justify-content:center" onclick="doSavePay('${clientId}')">${I.ok} Save</button>
+      <button class="btn gray" style="flex:1;justify-content:center" onclick="S.payModal=null;render()">Cancel</button>
+    </div>
+  </div></div>`;
+}
+
+async function doSavePay(clientId){
+  const date=document.getElementById('pm-date')?.value||today();
+  const amt=num(document.getElementById('pm-amt')?.value);
+  const note=document.getElementById('pm-note')?.value||'';
+  if(!amt){toast('Amount daalein','err');return;}
+  await savePayment({clientId,date,amount:amt,note});
+  toast('✓ Payment record!');S.payModal=null;render();
+}
+function payWA(name,pending){const lines=[`Namaste *${name} ji*`,``,`Aapka transport bakaya:`,`*${inr(pending)}*`,``,`Kripya jald payment karein.`,``,company.name||'Transport Company'].filter(Boolean);window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');}
+
+// ── HISTORY ──────────────────────────────────────────────────────────────
+function pageHistory(){
+  const f=S.histFilter;
+  const rf=f.period==='month'?new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().split('T')[0]:f.period==='week'?new Date(Date.now()-6*864e5).toISOString().split('T')[0]:f.from||'2020-01-01';
+  const rt=f.period==='custom'?f.to||today():today();
+  let filtered=trips.filter(t=>t.date>=rf&&t.date<=rt);
+  if(f.client!=='all')filtered=filtered.filter(t=>t.clientId===f.client);
+  if(f.vehicle!=='all')filtered=filtered.filter(t=>t.vehicleNo===f.vehicle);
+  const totalAmt=filtered.reduce((s,t)=>s+t.amount,0);
+  return `
+  <div class="phdr"><div class="phdr-title">Trip History 📋</div></div>
+  <div class="fbox">
+    <div class="row" style="margin-bottom:8px">
+      <div style="flex:1"><div class="flbl">Period</div>
+        <select class="fsel" onchange="S.histFilter.period=this.value;render()">
+          ${[['week','Hafte'],['month','Mahine'],['custom','Custom']].map(([v,l])=>`<option value="${v}" ${f.period===v?'selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <div style="flex:1"><div class="flbl">Client</div>
+        <select class="fsel" onchange="S.histFilter.client=this.value;render()">
+          <option value="all">Sabhi</option>${clients.map(c=>`<option value="${c.id}" ${f.client===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div style="flex:1"><div class="flbl">Vehicle</div>
+        <select class="fsel" onchange="S.histFilter.vehicle=this.value;render()">
+          <option value="all">Sabhi</option>${vehicles.map(v=>`<option value="${v}" ${f.vehicle===v?'selected':''}>${esc(v)}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${f.period==='custom'?`<div class="row"><div style="flex:1"><div class="flbl">Se</div><input type="date" class="finp" value="${f.from||''}" onchange="S.histFilter.from=this.value;render()"></div><div style="flex:1"><div class="flbl">Tak</div><input type="date" class="finp" value="${f.to||''}" onchange="S.histFilter.to=this.value;render()"></div></div>`:''}
+  </div>
+  <div class="scards">
+    <div class="sc"><div class="sc-v">${filtered.length}</div><div class="sc-l">Trips</div></div>
+    <div class="sc"><div class="sc-v" style="color:#15803d">${inr(totalAmt)}</div><div class="sc-l">Total</div></div>
+    <div class="sc"><div class="sc-v">${filtered.length>0?inr(Math.round(totalAmt/filtered.length)):'—'}</div><div class="sc-l">Avg/Trip</div></div>
+  </div>
+  <div class="action-row"><button class="btn green sm" onclick="histCSV()">${I.dl} CSV</button><button class="btn wa sm" onclick="histWA()">${I.wa} Share</button></div>
+  <div class="sec">
+    ${filtered.length===0?`<div class="empty"><div class="empty-e">📋</div><div>Koi trip nahi</div></div>`:''}
+    ${filtered.map(t=>`<div class="trip-row">
+      <div class="vpill">${esc(t.vehicleNo)}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis">${esc(t.client)}</div>
+      <div style="font-size:11px;color:#94a3b8">${fd(t.date)} · ${esc(t.from)}→${esc(t.to)}${t.driver?' · '+esc(t.driver):''}</div></div>
+      <div style="font-weight:900;font-size:13px;color:#16a34a">${inr(t.amount)}</div>
+      <button class="btn-del" onclick="delTrip('${t.id}')">${I.del}</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+function histCSV(){const f=S.histFilter;const rf=f.period==='month'?new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().split('T')[0]:f.period==='week'?new Date(Date.now()-6*864e5).toISOString().split('T')[0]:f.from||'2020-01-01';const rt=f.period==='custom'?f.to||today():today();let filtered=trips.filter(t=>t.date>=rf&&t.date<=rt);const csv='#,Tarikh,Vehicle,Driver,Client,From,To,Amount\n'+filtered.map((t,i)=>[i+1,fd(t.date),t.vehicleNo,t.driver||'',t.client,t.from,t.to,t.amount].join(',')).join('\n');dlFile(csv,'history.csv','text/csv');toast('✓ CSV!');}
+function histWA(){const total=trips.slice(0,10).reduce((s,t)=>s+t.amount,0);const lines=[`*Trip History*`,`Total: ${inr(total)}`,'─────────────',...trips.slice(0,8).map(t=>`${fd(t.date)} | ${t.vehicleNo} | ${t.client} | ${inr(t.amount)}`)];window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');}
+
+// ── MORE ──────────────────────────────────────────────────────────────────
+function pageMore(){
+  return `<div class="phdr"><div class="phdr-title">More</div></div>
+  <div class="sec">
+    ${[{e:'👥',l:'Clients',s:'Routes & rates',p:'clients'},{e:'🚛',l:'Fleet',s:vehicles.length+' vehicles',p:'fleet'},{e:'👨‍💼',l:'Drivers',s:drivers.length+' drivers',p:'drivers'},{e:'⚙️',l:'Settings',s:'Company info',p:'settings'}].map(m=>`<div class="trip-row" style="cursor:pointer;padding:14px;margin-bottom:8px" onclick="go('${m.p}')">
+      <div style="font-size:26px">${m.e}</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:14px">${m.l}</div><div style="font-size:12px;color:#94a3b8;margin-top:2px">${m.s}</div></div>
+      <div style="color:#94a3b8;font-size:20px">›</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ── CLIENTS ──────────────────────────────────────────────────────────────
+function pageClients(){
+  return `<div class="phdr"><button class="back-btn" onclick="go('more')">${I.back}</button><div class="phdr-title" style="flex:1">Clients</div><button class="hadd-btn" onclick="openCF()">${I.plus} Naya</button></div>
+  <div class="sec">
+    ${clients.length===0?`<div class="empty"><div class="empty-e">👥</div><div>Koi client nahi</div></div>`:''}
+    ${clients.map(c=>`<div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div class="avatar">${c.name[0].toUpperCase()}</div>
+        <div style="flex:1"><div style="font-weight:800;font-size:15px">${esc(c.name)}</div><div style="font-size:11px;color:#94a3b8">${c.gstNo||'Non-GST'} · ${c.routes?.length||0} routes</div></div>
+        <button class="btn-edit" onclick="openCF('${c.id}')">${I.edit}</button>
+        <button class="btn-del" onclick="delClient('${c.id}')">${I.del}</button>
+      </div>
+      ${(c.routes||[]).map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid #f1f5f9;font-size:13px">
+        <span style="font-size:11px;color:#94a3b8">📍</span><span style="flex:1;color:#475569">${esc(r.from)} → ${esc(r.to)}</span><span style="font-weight:700;color:#16a34a">${inr(r.rate)}</span>
+      </div>`).join('')}
+    </div>`).join('')}
+  </div>`;
+}
+
+function pageClientForm(){
+  const f=S.clientForm;
+  return `<div class="phdr"><button class="back-btn" onclick="closeCF()">${I.back}</button><div class="phdr-title">${S.editingClient?'Edit':'Naya'} Client</div></div>
+  <div class="sec">
+    <div class="row">
+      <div class="fgrp" style="flex:1.5"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px">Client Name *</label><input class="finp" id="cf-name" value="${esc(f.name)}" placeholder="Party naam..."></div>
+      <div class="fgrp" style="flex:1"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px">GST No.</label><input class="finp" id="cf-gst" value="${esc(f.gstNo)}" placeholder="27XXXXX..."></div>
+    </div>
+    <div style="font-weight:700;font-size:13px;margin:10px 0 8px;color:#334155">Routes & Rates</div>
+    ${f.routes.map((r,i)=>`<div class="rform">
+      <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#64748b;margin-bottom:8px">Route ${i+1}<button class="btn-del" onclick="delRt('${r.id}')">${I.del}</button></div>
+      <div class="row">
+        <div style="flex:1"><div class="flbl">From</div><input class="finp" id="cf-from-${r.id}" value="${esc(r.from)}" placeholder="Shehar"></div>
+        <div style="flex:1"><div class="flbl">To</div><input class="finp" id="cf-to-${r.id}" value="${esc(r.to)}" placeholder="Manzil"></div>
+        <div style="width:78px"><div class="flbl">Rate ₹</div><input class="finp" type="number" id="cf-rate-${r.id}" value="${r.rate||''}" placeholder="0"></div>
+      </div>
+    </div>`).join('')}
+    <button style="background:#eff6ff;color:#1d4ed8;border:2px dashed #93c5fd;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;margin-bottom:14px" onclick="addRt()">${I.plus} Route Add</button>
+    <div class="row"><button class="btn primary" onclick="doSaveCl()">${I.ok} Save</button><button class="btn gray" onclick="closeCF()">Cancel</button></div>
+  </div>`;
+}
+
+function openCF(id){
+  if(id){const c=clients.find(x=>x.id===id);S.clientForm={name:c.name,gstNo:c.gstNo||'',routes:(c.routes||[]).map(r=>({...r}))};S.editingClient=id;}
+  else{S.clientForm={name:'',gstNo:'',routes:[{id:uid(),from:'',to:'',rate:''}]};S.editingClient=null;}render();
+}
+function closeCF(){S.clientForm=null;S.editingClient=null;render();}
+function addRt(){S.clientForm.routes.push({id:uid(),from:'',to:'',rate:''});render();}
+function delRt(id){S.clientForm.routes=S.clientForm.routes.filter(r=>r.id!==id);render();}
+async function doSaveCl(){
+  const name=(document.getElementById('cf-name')?.value||'').trim();
+  const gstNo=(document.getElementById('cf-gst')?.value||'').trim();
+  if(!name){toast('Client naam daalein','err');return;}
+  const routes=S.clientForm.routes.map(r=>({...r,from:(document.getElementById('cf-from-'+r.id)?.value||r.from).trim(),to:(document.getElementById('cf-to-'+r.id)?.value||r.to).trim(),rate:num(document.getElementById('cf-rate-'+r.id)?.value||r.rate)})).filter(r=>r.from&&r.to&&r.rate);
+  if(!routes.length){toast('Ek route chahiye','err');return;}
+  const ok=await saveClient({name,gstNo,routes},S.editingClient);
+  if(ok){toast(S.editingClient?'Update ✓':'Client add ✓');closeCF();}
+}
+
+// ── FLEET ──────────────────────────────────────────────────────────────────
+function pageFleet(){
+  const vd=window._vehDetails||[];
+  // Check expiry alerts
+  const today30=new Date();today30.setDate(today30.getDate()+30);
+  const alerts=vd.filter(v=>v.insuranceExp&&new Date(v.insuranceExp)<=today30);
+  return `<div class="phdr"><button class="back-btn" onclick="go('more')">${I.back}</button><div class="phdr-title">Fleet (${vehicles.length})</div></div>
+  ${alerts.length?`<div style="background:#fef2f2;border:2px solid #dc2626;margin:10px 14px;border-radius:12px;padding:10px 14px">
+    <div style="font-weight:800;color:#dc2626;margin-bottom:4px">⚠️ Expiry Alert!</div>
+    ${alerts.map(v=>`<div style="font-size:12px;color:#991b1b">🚛 ${esc(v.number)} — Insurance: ${fd(v.insuranceExp)}</div>`).join('')}
+  </div>`:''}
+  <div class="sec">
+    <div class="fgrp"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:5px">Vehicle Number Add</label>
+      <div class="row"><input class="finp" id="new-veh" style="flex:1" placeholder="RJ14GB1239" onkeydown="if(event.key==='Enter')doAddVeh()"><button class="btn primary" onclick="doAddVeh()">${I.plus} Add</button></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      ${vehicles.map(v=>{const vInfo=(window._vehDetails||[]).find(x=>x.number===v)||{};const insExp=vInfo.insuranceExp;const rcExp=vInfo.rcExp;const insAlert=insExp&&new Date(insExp)<=today30;return`<div style="background:#fff;border-radius:12px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,.07);flex:1;min-width:140px;border-top:3px solid ${insAlert?'#dc2626':'#f97316'}">
+        <div style="font-weight:800;font-size:14px;margin-bottom:4px">${I.truck} ${esc(v)}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:4px">${trips.filter(t=>t.vehicleNo===v).length} trips</div>
+        ${insExp?`<div style="font-size:10px;color:${insAlert?'#dc2626':'#16a34a'};font-weight:700;margin-bottom:2px">🛡️ Ins: ${fd(insExp)}${insAlert?' ⚠️':''}</div>`:''}
+        ${rcExp?`<div style="font-size:10px;color:#1e40af;font-weight:700;margin-bottom:4px">📄 RC: ${fd(rcExp)}</div>`:''}
+        <div style="display:flex;gap:4px;margin-top:6px">
+          <button class="btn-edit" style="flex:1;font-size:11px" onclick="editVehDetails('${v}')">${I.edit}</button>
+          <button class="btn-del" style="flex:1;font-size:11px" onclick="doDelVeh('${v}')">${I.del}</button>
+        </div>
+      </div>`;}).join('')}
+    </div>
+  </div>`;
+}
+async function editVehDetails(vNum){
+  const vInfo=(window._vehDetails||[]).find(x=>x.number===vNum)||{};
+  const insExp=prompt('Insurance expiry date (YYYY-MM-DD):',vInfo.insuranceExp||'');
+  const rcExp=prompt('RC expiry date (YYYY-MM-DD):',vInfo.rcExp||'');
+  const vDoc=(window._vehDetails||[]).find(x=>x.number===vNum);
+  if(vDoc){
+    const updated={number:vNum,insuranceExp:insExp||'',rcExp:rcExp||''};
+    try{
+      await setDoc(userDocRef('vehicles',vDoc.id),updated);
+      const idx=window._vehDetails.findIndex(x=>x.number===vNum);
+      if(idx>=0)window._vehDetails[idx]={...window._vehDetails[idx],...updated};
+      toast('✓ Details saved!');render();
+    }catch(e){toast('Save error','err');}
+  }
+}
+async function doAddVeh(){const v=(document.getElementById('new-veh')?.value||'').trim().toUpperCase();if(!v)return;if(vehicles.includes(v)){toast('Pehle se hai','err');return;}await saveVehicle(v);document.getElementById('new-veh').value='';toast('Vehicle add ✓');}
+async function doDelVeh(v){if(!confirm(v+' delete?'))return;await delVehicle(v);toast('Deleted','err');}
+
+// ── DRIVERS ──────────────────────────────────────────────────────────────
+function pageDrivers(){
+  return `<div class="phdr"><button class="back-btn" onclick="go('more')">${I.back}</button><div class="phdr-title" style="flex:1">Drivers</div><button class="hadd-btn" onclick="openDF()">${I.plus} Naya</button></div>
+  <div style="background:linear-gradient(135deg,#f97316,#ea580c);margin:12px 14px;border-radius:12px;padding:12px 14px">
+    <div style="color:#fff;font-weight:900;font-size:14px;margin-bottom:3px">💰 Driver Salary Tracker</div>
+    <div style="color:rgba(255,255,255,.8);font-size:11px;margin-bottom:8px">Default: ₹600/day + extra kharche</div>
+    <button style="background:#fff;color:#ea580c;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:800" onclick="S.driverSalaryPage=true;render()">📊 Salary Calculate Karo →</button>
+  </div>
+  <div class="sec">
+    ${drivers.length===0?`<div class="empty"><div class="empty-e">👨‍💼</div><div>Koi driver nahi</div></div>`:''}
+    ${drivers.map(d=>{const dT=trips.filter(t=>t.driverId===d.id);const rate=d.dailyRate||600;return`<div class="card">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#a855f7)">${d.name[0].toUpperCase()}</div>
+        <div style="flex:1"><div style="font-weight:800;font-size:15px">${esc(d.name)}</div>
+          <div style="font-size:11px;color:#94a3b8">${d.phone?'📞 '+esc(d.phone):''} ${d.vehicle?'· 🚛 '+esc(d.vehicle):''}</div>
+          <div style="font-size:11px;margin-top:2px"><span style="color:#16a34a">${dT.length} trips</span> · <span style="color:#f97316;font-weight:700">₹${rate}/day</span></div>
+        </div>
+        <button class="btn-edit" onclick="openDF('${d.id}')">${I.edit}</button>
+        <button class="btn-del" onclick="doDelDr('${d.id}')">${I.del}</button>
+      </div>
+    </div>`;}).join('')}
+  </div>`;}
+
+function pageDriverSalary(){
+  const month=S.driverSalaryMonth;
+  const[yr,mo]=month.split('-').map(Number);
+  const daysInMonth=new Date(yr,mo,0).getDate();
+  return `<div class="phdr"><button class="back-btn" onclick="S.driverSalaryPage=null;render()">${I.back}</button><div class="phdr-title">Driver Salary 💰</div></div>
+  <div class="fbox" style="display:flex;gap:8px;align-items:flex-end">
+    <div style="flex:1"><div class="flbl">Month</div><input type="month" class="finp" value="${month}" onchange="S.driverSalaryMonth=this.value;render()"></div>
+    <div style="background:linear-gradient(135deg,#f97316,#ea580c);color:#fff;border-radius:10px;padding:9px 12px;text-align:center;min-width:80px"><div style="font-weight:900;font-size:14px">${daysInMonth}d</div><div style="font-size:9px;opacity:.8">Days</div></div>
+  </div>
+  <div class="sec">
+    ${drivers.length===0?`<div class="empty"><div class="empty-e">👨‍💼</div><div>Pehle driver add karo</div></div>`:''}
+    ${drivers.map(d=>{
+      const rate=d.dailyRate||600;
+      const dTrips=trips.filter(t=>t.driverId===d.id&&t.date.startsWith(month));
+      // Count unique working days
+      const workDays=new Set(dTrips.map(t=>t.date)).size;
+      const baseSalary=workDays*rate;
+      // Get extra expenses for this driver this month
+      const driverExtras=expenses.filter(e=>e.date.startsWith(month)&&e.driverName===d.name&&e.category==='driver_extra');
+      const extraTotal=driverExtras.reduce((s,e)=>s+e.amount,0);
+      const totalSalary=baseSalary+extraTotal;
+      return`<div class="card" style="border-left:4px solid #f97316">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div class="avatar" style="background:linear-gradient(135deg,#f97316,#ea580c)">${d.name[0].toUpperCase()}</div>
+          <div style="flex:1"><div style="font-weight:800;font-size:15px">${esc(d.name)}</div>
+            <div style="font-size:11px;color:#94a3b8">${d.vehicle||''} · ₹${rate}/day</div>
+          </div>
+          <div style="text-align:right"><div style="font-weight:900;font-size:16px;color:#f97316">${inr(totalSalary)}</div><div style="font-size:10px;color:#94a3b8">Total</div></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:8px">
+          <div style="flex:1;background:#fff7ed;border-radius:8px;padding:8px;text-align:center">
+            <div style="font-weight:900;font-size:14px;color:#ea580c">${workDays}</div>
+            <div style="font-size:10px;color:#94a3b8">Kaam ke Din</div>
+          </div>
+          <div style="flex:1;background:#eff6ff;border-radius:8px;padding:8px;text-align:center">
+            <div style="font-weight:900;font-size:14px;color:#1e40af">${inr(baseSalary)}</div>
+            <div style="font-size:10px;color:#94a3b8">Base Salary</div>
+          </div>
+          <div style="flex:1;background:#fef2f2;border-radius:8px;padding:8px;text-align:center">
+            <div style="font-weight:900;font-size:14px;color:#dc2626">${inr(extraTotal)}</div>
+            <div style="font-size:10px;color:#94a3b8">Extra</div>
+          </div>
+        </div>
+        ${driverExtras.length>0?`<div style="margin-bottom:8px">${driverExtras.map(e=>`<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid #f1f5f9;font-size:12px">
+          <span style="color:#94a3b8;flex:1">${fd(e.date)} · ${esc(e.desc||'Extra')}</span>
+          <span style="font-weight:700;color:#dc2626">${inr(e.amount)}</span>
+          <button class="btn-del" onclick="delExpense('${e.id}')">${I.del}</button>
+        </div>`).join('')}</div>`:''}
+        <button style="width:100%;background:#fff7ed;border:2px dashed #f97316;border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:#ea580c;cursor:pointer" onclick="addDriverExtra('${d.id}','${esc(d.name)}')">+ Extra Kharcha Jodo (Police/Labour/etc)</button>
+        <div style="margin-top:8px;border-top:2px solid #f1f5f9;padding-top:8px">
+          <div style="font-size:11px;font-weight:700;color:#475569;margin-bottom:6px">💳 Payment History</div>
+          ${driverPayments.filter(p=>p.driverId===d.id&&p.month===month).map(p=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f8fafc;font-size:12px">
+              <span style="flex:1;color:#475569">${fd(p.date)} · ${esc(p.note||p.type)}</span>
+              <span style="font-weight:700;color:${p.type==='advance'?'#f97316':'#16a34a'}">${p.type==='advance'?'ADV':''} ${inr(p.amount)}</span>
+              <button class="btn-del" onclick="delDriverPayment('${p.id}')">${I.del}</button>
+            </div>`).join('')}
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button style="flex:1;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700" onclick="addDriverPay('${d.id}','${esc(d.name)}','${month}','paid')">✅ Paid Karo</button>
+            <button style="flex:1;background:#f97316;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700" onclick="addDriverPay('${d.id}','${esc(d.name)}','${month}','advance')">💰 Advance Do</button>
+          </div>
+          <div style="background:#f8fafc;border-radius:8px;padding:8px;margin-top:6px;display:flex;justify-content:space-between">
+            <span style="font-size:12px;color:#475569">Total Paid:</span>
+            <span style="font-weight:900;color:#16a34a">${inr(driverPayments.filter(p=>p.driverId===d.id&&p.month===month).reduce((s,p)=>s+p.amount,0))}</span>
+          </div>
+          <div style="background:#fff7ed;border-radius:8px;padding:8px;margin-top:4px;display:flex;justify-content:space-between">
+            <span style="font-size:12px;color:#475569">Baaki:</span>
+            <span style="font-weight:900;color:#dc2626">${inr(Math.max(0,totalSalary-driverPayments.filter(p=>p.driverId===d.id&&p.month===month).reduce((s,p)=>s+p.amount,0)))}</span>
+          </div>
+        </div>
+      </div>\`;
+    }).join('')}
+  </div>`;
+}
+
+async function addDriverPay(driverId,driverName,month,type){
+  const amtStr=prompt(type==='advance'?'Advance amount ₹:':'Kitna paid kiya ₹:');
+  const amt=num(amtStr);
+  if(!amt||amt<=0){toast('Valid amount daalein','err');return;}
+  const note=prompt('Note (optional):')||'';
+  await saveDriverPayment(driverId,driverName,month,amt,type,note);
+  toast(type==='advance'?'✓ Advance add!':'✓ Payment mark!');
+}
+async function addDriverExtra(driverId,driverName){
+  const desc=prompt('Kharche ka naam (Police/Labour/etc):');
+  if(!desc)return;
+  const amtStr=prompt('Amount ₹:');
+  const amt=num(amtStr);
+  if(!amt||amt<=0){toast('Valid amount daalein','err');return;}
+  const dateStr=prompt('Tarikh (YYYY-MM-DD):',S.driverSalaryMonth+'-01');
+  const date=dateStr||S.driverSalaryMonth+'-01';
+  await saveExpense({date,category:'driver_extra',vehicle:'',desc,amount:amt,driverName,driverId});
+  toast('✓ Extra kharcha add!');
+}
+function pageDriverForm(){
+  const f=S.driverForm;
+  return `<div class="phdr"><button class="back-btn" onclick="closeDf()">${I.back}</button><div class="phdr-title">${S.editingDriver?'Edit':'Naya'} Driver</div></div>
+  <div class="sec">
+    <div class="fgrp"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px">Driver Name *</label><input class="finp" id="df-name" value="${esc(f.name)}" placeholder="Ramesh Kumar..."></div>
+    <div class="row">
+      <div class="fgrp" style="flex:1"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px">Phone</label><input class="finp" id="df-phone" type="tel" value="${esc(f.phone)}" placeholder="98XXXXXXXX"></div>
+      <div class="fgrp" style="flex:1"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px">Vehicle</label>
+        <select class="fsel" id="df-veh"><option value="">—</option>${vehicles.map(v=>`<option value="${v}" ${f.vehicle===v?'selected':''}>${esc(v)}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="fgrp"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px">Daily Salary Rate ₹</label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input class="finp" id="df-rate" type="number" value="${f.dailyRate||600}" placeholder="600" style="flex:1">
+        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px 12px;font-size:12px;color:#ea580c;font-weight:700;white-space:nowrap">Default: ₹600/day</div>
+      </div>
+    </div>
+    <div class="row"><button class="btn primary" onclick="doSaveDr()">${I.ok} Save</button><button class="btn gray" onclick="closeDf()">Cancel</button></div>
+  </div>`;}
+function openDF(id){
+  if(id){const d=drivers.find(x=>x.id===id);S.driverForm={name:d.name,phone:d.phone||'',vehicle:d.vehicle||'',dailyRate:d.dailyRate||600};S.editingDriver=id;}
+  else{S.driverForm={name:'',phone:'',vehicle:'',dailyRate:600};S.editingDriver=null;}render();
+}
+function closeDf(){S.driverForm=null;S.editingDriver=null;render();}
+async function doSaveDr(){
+  const name=(document.getElementById('df-name')?.value||'').trim();
+  const phone=(document.getElementById('df-phone')?.value||'').trim();
+  const vehicle=document.getElementById('df-veh')?.value||'';
+  const dailyRate=num(document.getElementById('df-rate')?.value)||600;
+  if(!name){toast('Driver naam daalein','err');return;}
+  const ok=await saveDriver({name,phone,vehicle,dailyRate},S.editingDriver);
+  if(ok){toast(S.editingDriver?'Update ✓':'Driver add ✓');closeDf();}
+}
+async function doDelDr(id){if(!confirm('Delete?'))return;await delDriver(id);toast('Deleted','err');}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+function pageSettings(){
+  const f=S.settForm;
+  const FIELDS=[{k:'name',l:'Company Name *',p:'Aapki Transport Co.'},{k:'address',l:'Address',p:'Gali, Mohalla'},{k:'city',l:'City, State',p:'Jaipur, Rajasthan'},{k:'phone',l:'Phone',p:'98XXXXXXXX'},{k:'gst',l:'GSTIN',p:'27XXXXX1234X1Z5'},{k:'bankName',l:'Bank Name',p:'SBI/HDFC'},{k:'bankAcc',l:'Account No.',p:'XXXXXXXXXXXX'},{k:'bankIFSC',l:'IFSC',p:'SBIN0001234'}];
+  return `<div class="phdr"><button class="back-btn" onclick="go('more')">${I.back}</button><div class="phdr-title">Settings ⚙️</div></div>
+  <div style="background:linear-gradient(135deg,#1e3a5f,#2563eb);margin:12px;border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px">
+    <div style="font-size:36px">🏢</div>
+    <div><div style="font-weight:900;font-size:16px;color:#fff">${esc(f.name||'Aapki Company')}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.6);margin-top:2px">${currentUser?.email}</div>
+    <div style="font-size:11px;color:rgba(255,255,255,.6)">${trips.length} trips · ${clients.length} clients</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Account</div>
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-weight:700;font-size:14px">${esc(currentUser?.email||'')}</div><div style="font-size:12px;color:#94a3b8">Firebase Account</div></div>
+      <button class="btn red sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Backup</div>
+    <button class="btn green full" style="margin-bottom:8px" onclick="fullBackup()">${I.dl} Full Backup (CSV)</button>
+    <div style="font-size:11px;color:#94a3b8">Data Firebase Cloud mein safe hai ✓</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Company Information</div>
+    ${FIELDS.map(fi=>`<div class="fgrp"><label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:4px">${fi.l}</label><input class="finp" value="${esc(f[fi.k]||'')}" placeholder="${fi.p}" oninput="S.settForm['${fi.k}']=this.value"></div>`).join('')}
+    <button class="btn primary full" onclick="doSaveSett()">${I.ok} Save Settings</button>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Data</div>
+    <div class="card">
+      ${[['Total Trips',trips.length],['Revenue',inr(trips.reduce((s,t)=>s+t.amount,0))],['Expenses',inr(expenses.reduce((s,e)=>s+e.amount,0))],['Profit',inr(trips.reduce((s,t)=>s+t.amount,0)-expenses.reduce((s,e)=>s+e.amount,0))],['Clients',clients.length],['Vehicles',vehicles.length],['Drivers',drivers.length]].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f1f5f9;font-size:13px"><span style="color:#475569">${l}</span><span style="font-weight:700">${v}</span></div>`).join('')}
+    </div>
+  </div>`;
+}
+
+async function doSaveSett(){
+  if(!S.settForm.name?.trim()){toast('Company naam daalein','err');return;}
+  await saveCompany({...S.settForm});S.settForm={...company};render();
+}
+function fullBackup(){
+  const csv='#,Tarikh,Vehicle,Driver,Client,From,To,Amount\n'+trips.map((t,i)=>[i+1,fd(t.date),t.vehicleNo,t.driver||'',t.client,t.from,t.to,t.amount].join(',')).join('\n');
+  dlFile(csv,'trips-backup-'+today()+'.csv','text/csv');
+  if(expenses.length){setTimeout(()=>{const ecsv='Tarikh,Category,Vehicle,Desc,Amount\n'+expenses.map(e=>[fd(e.date),e.category,e.vehicle||'',e.desc,e.amount].join(',')).join('\n');dlFile(ecsv,'expenses-backup-'+today()+'.csv','text/csv');},600);}
+  toast('✓ Backup complete!');
+}
+
+// ── EXPOSE FUNCTIONS ──────────────────────────────────────────────────────
+window.go=go;window.render=render;window.doAuth=doAuth;window.doLogout=doLogout;
+window.forgotPass=forgotPass;window.pageAuth=pageAuth;
+window.togV=togV;window.updCl=updCl;window.updRt=updRt;window.updF=updF;window.addRow=addRow;window.delRow=delRow;window.saveTrips=saveTrips;window.delTrip=delTrip;
+window.openPrint=openPrint;window.waShare=waShare;window.csvExp=csvExp;window.dlBill=dlBill;window.waBill=waBill;window.waBillPDF=waBillPDF;window.emailBill=emailBill;
+window.togCV=togCV;window.doSaveExp=doSaveExp;window.expCSV=expCSV;
+window.plCSV=plCSV;window.plWA=plWA;
+window.doSavePay=doSavePay;window.payWA=payWA;
+window.histCSV=histCSV;window.histWA=histWA;
+window.openCF=openCF;window.closeCF=closeCF;window.addRt=addRt;window.delRt=delRt;window.doSaveCl=doSaveCl;window.delClient=delClient;
+window.doAddVeh=doAddVeh;window.doDelVeh=doDelVeh;
+window.openDF=openDF;window.closeDf=closeDf;window.doSaveDr=doSaveDr;window.doDelDr=doDelDr;
+window.doSaveSett=doSaveSett;window.fullBackup=fullBackup;
+window.addDriverExtra=addDriverExtra;
+window.addDriverPay=addDriverPay;
+window.delDriverPayment=delDriverPayment;
+window.editVehDetails=editVehDetails;
+window.plPDF=plPDF;
+window.S=S;
+
+// Service Worker
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(()=>console.log('SW ready')).catch(e=>console.log('SW err:',e));});}
+</script>
+</body>
+</html>
